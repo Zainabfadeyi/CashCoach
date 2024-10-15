@@ -1,0 +1,129 @@
+.TopContainer{
+    display: flex;   
+    width: 100%;
+    column-gap: 5px;
+}
+.first{
+    width: 100%;
+    column-gap: 10px;
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+   
+    
+}
+.second{
+    width: 100%;
+    column-gap: 10px;
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    border-radius: 10px;
+    border: 1px solid #e5e5e5;
+    padding: 10px;
+    justify-content: center;
+    display: flex;
+    background-color: #fff;
+
+}
+.plus{
+    display: flex;
+    align-items: center;
+    font-size: 25px;
+    color: #0072BB;
+    cursor: pointer;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    background-color: #D9EAF5;
+    margin: 0px 17px 4px 17px;
+    padding: 16px;
+    justify-content: center;
+
+}
+.section{
+    padding: 10px;
+}
+.barContainer{
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+   
+
+}
+.progress{
+    width: 30%;
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+    
+
+}
+.wrapper{
+    padding: 0;
+}
+   
+.category{
+    font-size: 18px;
+    font-weight: 600;
+    justify-content: space-between;
+    display: flex;
+    align-items: center;
+}
+
+.display{
+    display: flex;
+    justify-content: space-between;
+    column-gap: 20px;
+    margin-top: 30px;
+}
+.monthDropdown{
+    padding: 5px;
+    color:#1F2C73;
+    border: 1px solid #c5c5c5;
+    border-radius: 5px;
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    cursor: pointer;
+    
+}
+.progressLine{
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+    align-items: center;
+    width: 100%;
+
+
+}
+.categoryList{
+    width: 100%;
+    
+}
+.categoryDetails{
+    display: flex;
+    width: 100%;
+   align-items: center;
+}
+
+.OverallPrg{
+    display: flex;
+    width: 100%;
+    align-items: center;
+    padding:10px 0px 10px 0px;
+
+}
+.LineChart{
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #fff;
+}
+
+
+  

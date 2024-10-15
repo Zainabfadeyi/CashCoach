@@ -1,0 +1,148 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modalContent {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+
+.modalTitle {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}
+
+.closeButton {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.formGroup {
+    margin-bottom: 1rem;
+}
+
+.input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.label {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    font-weight: 600;
+}
+
+.amountButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.amountButton {
+    background-color: #f0f0f0;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.amountButton:hover {
+    background-color: #e0e0e0;
+}
+
+.categoryButtons {
+    display: flex;
+    gap: 1rem;
+}
+.row {
+    display: flex;
+    gap: 1rem;
+}
+.rowChild{
+    flex: 1;
+}
+.categoryButtonExpense {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 0, 0, 1);
+    border-radius: 10px;
+    background-color: rgba(255, 0, 0, 0.15);
+    cursor: pointer;
+    color: rgba(255, 0, 0, 1);
+    font-size: 1rem;
+}
+.categoryButtonIncome {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid #07881C;
+    border-radius: 10px;
+    background-color: rgba(7, 136, 28, 0.15);
+    cursor: pointer;
+    font-size: 1rem;
+    color: rgba(7, 136, 28, 1);
+
+}
+.categoryButtonIncome.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+.categoryButtonExpense.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.addButton {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+.addButton:hover {
+    background-color: #0056b3;
+}
+
+@media (max-width: 600px) {
+    .modalContent {
+        padding: 1.5rem;
+    }
+
+    .amountButtons {
+        flex-direction: column;
+    }
+
+    .amountButton {
+        width: 100%;
+    }
+}

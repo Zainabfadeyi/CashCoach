@@ -1,0 +1,59 @@
+.Budget{
+    display: flex;
+    column-gap: 35px;
+
+}
+.BudgetSecond{
+    background-color: #fff;
+    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    padding: 15px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+
+}
+.header{
+    background-color: #fff;
+   box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    padding: 15px;
+    font-size: 30px;
+    color: #1F2C73;
+    font-weight: 700;
+    margin-bottom: 30px;
+    border-radius: 10px;
+
+}
+.update{
+    display: flex;
+    width: 100%;
+   justify-content: space-between;
+   align-items: center;
+   background-color: #fff;
+   box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    padding: 15px;
+    margin-bottom: 30px;
+    border-radius: 10px;
+  
+}
+.BudgetFirst{
+    justify-content: space-between;
+    background-color: #fff;
+   box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    padding: 15px;
+    align-items: center;
+    display:flex ;
+    flex-direction: row;
+    margin-bottom: 20px;
+    column-gap: 10px;
+    border-radius: 10px;
+    
+}
+.Add{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+   box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 10px;
+}

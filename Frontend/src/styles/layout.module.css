@@ -1,0 +1,26 @@
+.right {
+    width: 100%;
+    min-width: (60vw);
+    max-height: 100dvh;
+    overflow-y: scroll;
+   
+ }
+
+ 
+ .right {
+   
+   overflow-y: scroll;
+   padding: 40px;
+   max-height: 100dvh;
+   width: 100%;
+   background-color: #F6F9FC;
+   overflow-x: hidden;
+ }
+ 
+ @media screen and (max-width: 768px) {
+   .right {
+  
+      width: 100vw; 
+   }
+ }
+ 

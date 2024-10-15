@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.RegContainer{
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* padding: 30px 0; */
+    
+   
+}
+.ImgContainer{
+    justify-content: center;
+    /* width: 100%; */
+    display: flex;
+    align-items: center;
+}
+.RegImage{
+    width: 100%;
+    height: auto;
+}
+.RegImageLogin{
+    height:auto;
+    width:100%;
+}
+
+
+.Login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    height: 100dvh;
+
+    
+}
+.Reg{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    /* height: 100dvh; */
+    
+}
+.LogoWrapper {
+    display: flex;
+    justify-content: center;
+    /* margin-bottom: 25px; */
+    column-gap: 10px;
+    width: 100%;
+    align-items: center;
+}
+.LogoWrapper  {
+    font-size: 25px;
+}
+.LogoWrapper {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+.LogoWrapper  svg {
+    color: #1C2237;
+}
+.LogoWrapper {
+    color: #1C2237;
+    font-weight: 600;
+}
+
+.sectionReg {
+  width: 100%;
+  max-width: 420px;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 30px;
+ 
+}
+
+.sectionReg {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    border: #ccc 1px solid;
+    border-radius: 15px;
+}
+
+.formReg {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    flex-grow: 1;
+}
+.inputReg[type="text"],
+.inputReg[type="password"],
+.inputReg[type="email"],
+.inputReg{
+  font-family: 'Nunito', sans-serif;
+  font-size: 22px;
+  padding: 4px 15px;
+  border-radius: 0.5rem;
+  outline: none;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  height: 40px;
+  
+}
+
+.RegLabel{
+  margin: 20px 0 5px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.buttonReg {
+  margin: 20px 0;
+  background: #1C2237;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  height: 40px;
+}
+
+.instructions {
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+    background: #000;
+    color: #fff;
+    padding: 0.25rem;
+    position: relative;
+    bottom: -10px;
+}
+
+.instructions > svg {
+    margin-right: 0.25rem;
+}
+
+.offscreen {
+    position: absolute;
+    left: -9999px;
+}
+
+.hide {
+    display: none;
+}
+
+.valid {
+    color: limegreen;
+    margin-left: 0.25rem;
+}
+
+.invalid {
+    color: red;
+    margin-left: 0.25rem;
+}
+
+.errmsg {
+    background-color: lightpink;
+    color: firebrick;
+    font-weight: bold;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.line {
+    display: inline-block;
+}
+.suggest {
+    font-size: 14px;
+    font-weight: 600;
+}
+.suggest a {
+    color: #555;
+    padding-left: 5px;
+}
+.suggest a:hover{
+    color:#1C2237
+}
+@media screen and (max-width: 700px) {
+    .RegContainer{
+        width: 100%;
+    }
+    .ImgContainer{
+        display: none;
+    }
+}

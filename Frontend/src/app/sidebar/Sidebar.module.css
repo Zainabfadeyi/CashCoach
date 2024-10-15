@@ -1,0 +1,152 @@
+.sidebar {
+  /* position: fixed; */
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 230px;
+  background-color: white;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+}
+
+.closed {
+  width: 60px;
+}
+
+.toggleButton {
+  right: -30px;
+  top: 20px;
+  background-color: white;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  padding: 10px;
+  cursor: pointer;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+/* .navLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: black;
+  width: 100%;
+} */
+
+.logo {
+  padding: 20px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ .navigation ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  justify-content: center;
+  margin-left: 10px;
+}
+
+/* .navItem {
+  padding: 15px 20px;
+  
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}  */
+
+
+/* .navItem.active {
+  background-color: #e9ecef;
+} */
+
+/* .navItem.active .navText {
+  color: #0072BB;
+  font-weight:600;
+} */
+/* .navItem.active .navText,
+.navItem.active .icon {
+  color: #0072BB;
+  font-weight: 600;
+} */
+
+
+.icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+
+.navText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.closed .navText {
+  display: none;
+}
+
+.bottomSection {
+  margin-top: auto;
+  padding: 20px;
+}
+
+.settingsLink, .logoutLink {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+}
+
+.settingsLink:hover, .logoutLink:hover {
+  color: #007bff;
+}
+
+.closed .bottomSection {
+  padding: 20px 0;
+}
+
+.closed .navItem {
+  padding: 15px 0;
+  justify-content: center;
+}
+
+.closed .icon {
+  margin-right: 0;
+}
+
+.sidebarWrap {
+  width: 100%;
+} 
+  
+.navIconClose {
+  margin-left: 2rem;
+  font-size: 20px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  cursor: pointer;
+ 
+}
+
+.sidebarItem:hover{
+  background: #252831;
+    border-left: 3px solid #632ce4;
+    cursor: pointer;
+    color: #f5f5f5;
+}
+
