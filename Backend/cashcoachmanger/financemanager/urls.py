@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.contrib import admin
 from users.views import RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView
 from rest_framework.routers import DefaultRouter
-from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView,ExpensesBreakdownView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,BudgetprogressView,PreviousMonthBudgetView,WeeklySpendingChartView
+from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView,ExpensesBreakdownView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,BudgetprogressView,PreviousMonthBudgetView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView
 
 router = DefaultRouter()
 router.register(r'auth/register', RegisterationViewSet,basename='auth-register')
@@ -40,7 +40,9 @@ urlpatterns = [
     path('api/dashboard/total-income/', TotalIncomeView.as_view(), name='total-income'),
     path('api/dashboard/total-expenses/', TotalExpensesView.as_view(), name='total-expenses'),
     path('api/dashboard/daily-income-trend/', DailyIncomeTrendView.as_view(), name='daily-income-trend'),
-    path('api/dashboard/expense-categories/', ExpensesBreakdownView.as_view(), name='expense-category-list'),
+    path('api/expenses-by-category/', ExpenseByCategoryView.as_view(), name='expenses-by-category'),
+    path('api/income-by-category/', IncomeByCategoryView.as_view(), name='income-by-category'),
+    path('api/dashboard/monthly-expense-breakdown/', MonthlyExpenseCategoryView.as_view(), name='expense-category-list'),
     path('api/dashboard/budget-summary', BudgetDashboardView.as_view(), name='budget-summary'),
     path('api/dashboard/monthly-income-expense/', MonthlyIncomeExpenseView.as_view(), name='monthly-income-expense'),
     # path('api/transactions/', TransactionViewSet.as_view(), name='transaction-list'),

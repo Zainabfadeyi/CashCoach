@@ -21,7 +21,7 @@ class AllCategory(models.Model):
     category_type = models.CharField(
         max_length=7,
         choices=CATEGORY_TYPE_CHOICES,
-       null =False
+        null =False
     )
 
     def __str__(self):
@@ -125,6 +125,8 @@ class Transaction(models.Model):
                 self.budget.spent_amount = F('spent_amount') + self.amount
         # Set transaction_type based on category before saving
         self.transaction_type = "Income" if self.category == "Income" else "Expenses"
+        if self.category:
+            self.transaction_type = self.category.category_type
         super().save(*args, **kwargs)
 
     def __str__(self):
