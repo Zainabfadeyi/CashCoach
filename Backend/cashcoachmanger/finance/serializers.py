@@ -7,14 +7,19 @@ from datetime import datetime, timedelta
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AllCategory
+
         fields = ['id','name', 'category_type']
 
 
+
+def __str__(self):
+        return self.name
 
 class IncomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Income
         exclude=['user']    
+        read_only_fields=['user','created_at']
 
 
 class ExpenseSerializer(serializers.ModelSerializer):
@@ -128,20 +133,32 @@ class ExpensesBreakdonwnSerializer(serializers.ModelSerializer):
 
 class TransactionSerializer(serializers.ModelSerializer):
     transaction_type = serializers.ReadOnlyField()
+    category = serializers.PrimaryKeyRelatedField(queryset=AllCategory.objects.all())  # Accept category ID
 
     class Meta:
         model = Transaction
-        fields = ['id','transaction_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
+        fields = ['id', 'transaction_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
+        # exclude = ['user']
 
     def validate(self, attrs):
-        # Ensure that the category is valid
-        if attrs['category'] not in dict(Transaction.EXPENSE_CATEGORY_CHOICES) and attrs['category'] != "Income":
-            raise serializers.ValidationError(f"Category must be one of the following: {', '.join([c[0]
-        for c in Transaction.EXPENSE_CATEGORY_CHOICES])} or 'Income'")
+        category = attrs.get('category')
+
+        if not category:
+            raise serializers.ValidationError("Category is required.")
+
+        # Ensure the category exists and retrieve its type
+        if isinstance(category, AllCategory):  # If category is a valid Category instance
+            transaction_type = category.category_type  # Derive the transaction type from the category
+
+            # Ensure the derived transaction_type matches the expected category type
+            if transaction_type != category.category_type:
+                raise serializers.ValidationError(
+                    f"The selected category '{category.name}' is not valid for '{transaction_type}' transactions."
+                )
+        else:
+            raise serializers.ValidationError("Invalid category data provided.")
+
         return attrs
-    exclude=['user']
-
-
 class TransactionDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
