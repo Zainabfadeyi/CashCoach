@@ -116,6 +116,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
 
 
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   // Fetch all categories from the API
   const fetchCategories = async () => {
     try {
@@ -123,6 +124,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+       
       });
       setCategories(response.data);
       filterCategories(response.data); // Filter categories after fetching
@@ -152,18 +154,44 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
     setAmount(value);
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   const transactionType = category_type === 'Income' ? 'Income' : 'Expense';
+  //   onAdd({ 
+  //     amount, 
+  //     transaction_date, 
+  //     description, 
+  //     category: selectedCategory, // Use selectedCategory for the selected category name
+  //     transaction_type: transactionType 
+  //   });
+  //   onClose();
+  // };
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const transactionType = category_type === 'Income' ? 'Income' : 'Expense';
-    onAdd({ 
+    
+    const transactionData = { 
       amount, 
       transaction_date, 
       description, 
-      category: selectedCategory, // Use selectedCategory for the selected category name
+      category: selectedCategory, 
       transaction_type: transactionType 
-    });
-    onClose();
+    };
+    
+    try {
+      const response = await axios.post(`transactions/?user_id=${userId}`, transactionData, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      });
+      console.log('Transaction added:', response.data); // Optionally log or handle the response
+      onAdd(response.data); // Call onAdd with the response data if necessary
+      onClose();
+    } catch (error) {
+      console.error('Error adding transaction:', error);
+    }
   };
+  
 
   const [selectedCategory, setSelectedCategory] = useState(filteredCategories[0]?.name || ''); // Default selected category
 

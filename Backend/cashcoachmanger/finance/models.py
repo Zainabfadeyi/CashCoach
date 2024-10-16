@@ -95,7 +95,7 @@ class ExpenseCategory(models.Model):
 
 
 class Transaction(models.Model):
-    TRANSACTION_TYPE_CHOICES = [
+    category_TYPE_CHOICES = [
         ("Income", "Income"),
         ("Expenses", "Expenses"),
     ]
@@ -108,11 +108,11 @@ class Transaction(models.Model):
     description = models.TextField()
     transaction_date = models.DateField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    transaction_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)  # Add this field
+    category_type = models.CharField(max_length=255, choices=category_TYPE_CHOICES, null=False)  # Add this field
 
     def save(self, *args, **kwargs):
         # check if the transaction is an expense and linked to a budget
-        if self.transaction_type == 'expense' and self.budget:
+        if self.category_type == 'expense' and self.budget:
             #  find a budget that matches the category, if none provided
             if not self.budget:
                 try:
@@ -123,14 +123,14 @@ class Transaction(models.Model):
             if self.budget and self.category == self.budget.category:
                 # add the expense amount to the budget spent amount
                 self.budget.spent_amount = F('spent_amount') + self.amount
-        # Set transaction_type based on category before saving
-        self.transaction_type = "Income" if self.category == "Income" else "Expenses"
+        # Set category_type based on category before saving
+        self.category_type = "Income" if self.category == "Income" else "Expenses"
         if self.category:
-            self.transaction_type = self.category.category_type
+            self.category_type = self.category.category_type
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.username} - {self.transaction_type} of {self.amount} in {self.category} on {self.transaction_date}"
+        return f"{self.user.username} - {self.category_type} of {self.amount} in {self.category} on {self.transaction_date}"
     
      
 

@@ -135,12 +135,12 @@ class ExpensesBreakdonwnSerializer(serializers.ModelSerializer):
 
 
 class TransactionSerializer(serializers.ModelSerializer):
-    transaction_type = serializers.ReadOnlyField()
+    category_type = serializers.ReadOnlyField()
     category = serializers.ReadOnlyField()
 
     class Meta:
         model = Transaction
-        fields = ['id', 'transaction_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
+        fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
         # exclude = ['user']
 
     # def validate(self, attrs):
@@ -151,12 +151,12 @@ class TransactionSerializer(serializers.ModelSerializer):
 
     #     # Ensure the category exists and retrieve its type
     #     if isinstance(category, AllCategory):  # If category is a valid Category instance
-    #         transaction_type = category.category_type  # Derive the transaction type from the category
+    #         category_type = category.category_type  # Derive the transaction type from the category
 
-    #         # Ensure the derived transaction_type matches the expected category type
-    #         if transaction_type != category.category_type:
+    #         # Ensure the derived category_type matches the expected category type
+    #         if category_type != category.category_type:
     #             raise serializers.ValidationError(
-    #                 f"The selected category '{category.name}' is not valid for '{transaction_type}' transactions."
+    #                 f"The selected category '{category.name}' is not valid for '{category_type}' transactions."
     #             )
     #     else:
     #         raise serializers.ValidationError("Invalid category data provided.")
@@ -165,4 +165,4 @@ class TransactionSerializer(serializers.ModelSerializer):
 class TransactionDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ['id','transaction_type','transaction_date', 'category', 'amount', 'description']
+        fields = ['id','category_type','transaction_date', 'category', 'amount', 'description']
