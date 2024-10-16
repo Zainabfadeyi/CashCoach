@@ -202,6 +202,7 @@ import { CiSearch } from "react-icons/ci";
 import styles from "../../../styles/table.module.css";
 import { TRANSACTIONS } from "../../data"; // Adjust the import based on your file structure
 import ActionsDropdown from "../mainpage/ActionDropdown";
+import DownloadBtn from "./DownloadBtn";
 
 const TanStackTable = () => {
   const columnHelper = createColumnHelper();
@@ -224,7 +225,7 @@ const TanStackTable = () => {
       },
     }),
     columnHelper.accessor("category", {
-      header: "Category Name",
+      header: "Category",
       cell: (info) => <span>{info.getValue()}</span>,
     }),
     columnHelper.accessor("category_type", {
@@ -268,14 +269,19 @@ const handleDelete = (transactionId) => {
     <div className={styles.tableContainer}>
       <div className={styles.tableHeader}>
         <div className={styles.searchContainer}>
-          <DebouncedInput
-            value={globalFilter ?? ""}
-            onChange={(value) => setGlobalFilter(String(value))}
-          />
-        </div>
+            <div style={{display:"flex", width:"100%", alignItems:"center"}}>
+           
+            <DebouncedInput
+              value={globalFilter ?? ""}
+              onChange={(value) => setGlobalFilter(String(value))}
+              
+            />
+          </div>
+          <DownloadBtn data={data} fileName={"All Requests"} />
+          </div>
       </div>
       <table className={styles.table}>
-        <thead className={styles.tableHeader}>
+        <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (

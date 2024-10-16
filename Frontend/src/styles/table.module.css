@@ -13,7 +13,8 @@
     justify-content: space-between;
     margin-bottom: 20px;
     align-items: center;
-    padding: 10px;
+    padding: 10px; 
+    display: flex;
     
   }
   
@@ -56,8 +57,11 @@
   
   .tableHeaderCell {
     text-transform: capitalize;
-   padding: 10px;
-    align-content: center;
+   padding: 6px;
+    text-align: center;
+    color:#1f2c73 ;
+    font-size: 13px;
+
    
 
   }
@@ -86,6 +90,10 @@
   
   .tableCell {
     padding: 20px 10px;
+    color: #7184ad;
+    text-align: center;
+    font-size: 13px;
+  
   }
   
   .noRecordRow {
@@ -186,3 +194,17 @@
     background-color: #f1f1f1;
   }
   
+  .DownloadBtn{
+    background-color: blue;
+    border: none;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  .DownloadBtn:hover{
+    background-color: #3b82f6;
+  }

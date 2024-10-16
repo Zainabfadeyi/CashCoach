@@ -8,10 +8,10 @@ import CircleProgress from '../component/analytics/CircleProgress';
 const Expenses = () => {
   return (
     <div className={styles.Expenses}>
-      <div style={{width:"100%"}}>
+      <div style={{width:"30%"}}>
         <CircleProgress/>
       </div>
-      <div style={{width:"100%"}}> 
+      <div style={{width:"70%"}}> 
         <TanStackTable/>
       </div>
     </div>

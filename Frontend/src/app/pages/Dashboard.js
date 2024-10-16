@@ -40,7 +40,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/transactions/totals/${selectedMonth}`
+        const response = await axios.get(`/transactions/${selectedMonth}/`
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -63,7 +63,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/transactions/totals/${selectedIncomeMonth}`
+        const response = await axios.get(`/transactions/${selectedIncomeMonth}/`
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -95,7 +95,7 @@ const Dashboard = () => {
   };
   return (
     <div className={styles.container}>
-      <div style={{marginBottom:"20px", marginTop:"-15px",fontSize:"15px",color:"#1F2C73"}}>Welcome Ekash Finance Management</div>
+      <div style={{marginBottom:"20px", marginTop:"-15px",fontSize:"15px",color:"#1F2C73"}}>Welcome Cash Coach Finance Management</div>
       <div className={styles.TopContainer}>
       <div className={styles.first}>
           <div style={{ display: "flex", justifyContent: "space-between" , alignItems:"center"}}>

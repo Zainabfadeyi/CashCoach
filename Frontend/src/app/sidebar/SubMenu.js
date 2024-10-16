@@ -9,7 +9,7 @@ const SidebarLink = styled(Link)`
   color: ${props => (props.isActive ? '#f5f5f5' : '#000')};
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 12px;
   list-style: none;
   text-decoration: none;
   font-size: 16px;
@@ -35,7 +35,7 @@ const DropdownLink = styled(Link)`
   align-items: center;
   text-decoration: none;
   color:${props => (props.isActive ? '#f5f5f5' : '#000')};
-  font-size: 18px;
+  font-size: 15px;
   background: ${props => (props.isActive ? '#632ce4' : 'transparent')};
 
   &:hover {
@@ -56,7 +56,7 @@ const SubMenu = ({ item, activeLink, setActiveLink }) => {
         <div
           className={`${styles.sidebarItem} ${subnav ? styles.open : ''}`}
           onClick={showSubnav}
-          style={{ padding:"20px", fontSize: '18px', cursor: 'pointer', justifyContent: 'space-between', display:"flex" }}
+          style={{ padding:"12px", fontSize: '15px', cursor: 'pointer', justifyContent: 'space-between', display:"flex" }}
         >
           <div>
             {item.icon}

@@ -13,6 +13,8 @@ import ExpenseModal from './app/component/ExpenseModal';
 import Categories from './app/pages/Categories';
 import Analytics from './app/pages/Analytics';
 import Expenses from './app/pages/Expenses';
+import Income from './app/pages/Income';
+import IncvsExp from './app/pages/IncvsExp';
 
 
 const App = () => {
@@ -32,6 +34,8 @@ const App = () => {
             <Route path='/userprofile' element={<UserProfileForm/>}/>
             <Route path="/analytics" element={<Analytics/>}/>
             <Route path="/expenses" element={<Expenses/>}/>
+            <Route path="/income" element={<Income/>}/>
+            <Route path="/IncxExp" element={<IncvsExp/>}/>
             
             
             </Route>

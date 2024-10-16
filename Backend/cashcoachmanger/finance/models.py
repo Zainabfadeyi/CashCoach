@@ -25,7 +25,7 @@ class AllCategory(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.category_type})"
 
     # Income Model
 class Income(models.Model):

@@ -33,7 +33,7 @@ router.register(r'expenses', ExpenseViewSet,basename='expenses')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('', include(router.urls)), 
+    path('api/', include((router.urls, "api"))), 
     path("api/user/details/", UserDetailsView.as_view({'get': 'list'}), name='user-details'),
     path("api/transactions/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
     path('api/transactions/<int:pk>/', TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),

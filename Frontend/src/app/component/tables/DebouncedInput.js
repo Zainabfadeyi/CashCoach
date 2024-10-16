@@ -26,7 +26,7 @@ const DebouncedInput = ({
       value={value}
       onChange={(e) => setValue(e.target.value)}
       className={styles.debouncedInput}
-      placeholder="search for transactions..."
+      placeholder="search ..."
     />
   );
 };

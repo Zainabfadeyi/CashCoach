@@ -1,5 +1,5 @@
 {
-  "name": "person-finance-manager",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -28,7 +28,8 @@
     "react-scripts": "5.0.1",
     "reactstrap": "^9.2.2",
     "styled-components": "^6.1.13",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "react-scripts start",
