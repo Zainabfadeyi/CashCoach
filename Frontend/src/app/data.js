@@ -51,8 +51,14 @@ import { faker } from "@faker-js/faker";
 
 // Function to create a random transaction
 export function createRandomTransaction() {
+  // Generate a random date within the past 12 months
+  const randomPastDate = faker.date.between(
+    new Date(new Date().setMonth(new Date().getMonth() - 12)),
+    new Date()
+  ).toISOString();
+
   return {
-    transaction_date: faker.date.recent().toISOString(), // Adjusted for a consistent format
+    transaction_date: randomPastDate, // Using the random date over the last 12 months
     transaction_id: faker.datatype.uuid(),
     description: faker.lorem.sentence(),
     amount: parseFloat(faker.finance.amount(10, 1000, 2)),
@@ -63,7 +69,7 @@ export function createRandomTransaction() {
       "Travel",
       "Miscellaneous",
     ]),
-    transaction_type: faker.helpers.arrayElement(["Income", "Expenses"]), // Updated for consistency
+    transaction_type: faker.helpers.arrayElement(["Income", "Expenses"]),
     actions: "Actions",
   };
 }

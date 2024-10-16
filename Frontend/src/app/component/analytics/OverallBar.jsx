@@ -11,7 +11,7 @@ const groupDataByMonth = (transactions) => {
   // Get the last 12 months, including the current month
   for (let i = 0; i < 12; i++) {
     const monthDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
-    const monthName = monthDate.toLocaleString('default', { month: 'long' });
+    const monthName = monthDate.toLocaleString('default', { month: 'short' });
     const year = monthDate.getFullYear();
     
     // Initialize income and expenses for each month
@@ -20,7 +20,7 @@ const groupDataByMonth = (transactions) => {
 
   transactions.forEach((transaction) => {
     const transactionDate = new Date(transaction.transaction_date);
-    const month = transactionDate.toLocaleString('default', { month: 'long' });
+    const month = transactionDate.toLocaleString('default', { month: 'short' });
     const year = transactionDate.getFullYear();
     const monthYear = `${month} ${year}`;
     
@@ -55,12 +55,11 @@ const OverallBar = () => {
           indexBy="month"
           margin={{ top: 50, right: 100, bottom: 70, left: 90 }}
           borderWidth={2}
-          padding={0.8}
+          padding={0.1}
           groupMode="grouped"
           valueScale={{ type: "linear" }}
           indexScale={{ type: "band", round: true }}
-          colors={["#0072BB", "#909090"]}
-          borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}
+          colors={["#2F2CD8", "#D5D5F7"]}
           borderRadius={0}
           axisTop={null}
           axisRight={null}

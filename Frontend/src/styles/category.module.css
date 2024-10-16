@@ -22,7 +22,8 @@
 .modalTitle {
     margin-top: 0;
     margin-bottom: 1.5rem;
-    font-size: 1.5rem;
+    font-size: 18px;
+     color:#1F2C73
 }
 
 .closeButton {
@@ -45,6 +46,7 @@
     border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 1rem;
+    color: #7184AD;
 }
 
 .label {
@@ -52,6 +54,7 @@
     padding-bottom: 5px;
     font-weight: 600;
     width: 100%;
+    color: #7184AD;
 }
 
 .amountButtons {
@@ -153,6 +156,7 @@
     width: 100%;
     padding: 15px;
     margin-bottom: 35px;
+    
 
 
 }
@@ -168,7 +172,7 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    font-size: 20px;
+    font-size: 15px;
 }
 .icon{
     display: flex;

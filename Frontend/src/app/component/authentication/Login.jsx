@@ -13,7 +13,7 @@ import React, {
   import { clearUser, getUser, setUser } from "../../../api/slices/userSlices";
   import { login } from '../../../api/slices/authSlices';
   
-  const LOGIN_URL = "/auth/login/";
+  const LOGIN_URL = "auth/login/";
   
   const Login = () => {
     const userRef = useRef(null);
@@ -61,7 +61,7 @@ import React, {
         setTimeout(() => {
           window.location.href = '/dashboard';}, 2000)
            
-            const userDetailsResponse = await axios.get('/user/details', {
+            const userDetailsResponse = await axios.get('/user/details/', {
               headers: { Authorization: `Bearer ${response?.data?.access}` },
             });
             // console.log(userDetailsResponse);

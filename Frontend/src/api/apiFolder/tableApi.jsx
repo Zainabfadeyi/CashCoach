@@ -8,7 +8,7 @@ export const useFetchTransactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const apiUrl = `/transactions`;
+      const apiUrl = `/transactions/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,

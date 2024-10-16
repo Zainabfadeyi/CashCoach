@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AllCategory
-        fields = ['id','name']
+        fields = ['id','name', 'category_type']
 
 
 
