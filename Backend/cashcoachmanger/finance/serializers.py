@@ -7,9 +7,7 @@ from datetime import datetime, timedelta
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = AllCategory
-
-        fields = ['id','name', 'category_type']
-
+        fields = ['id','name','category_type']
 
 
 def __str__(self):
@@ -31,7 +29,7 @@ class ExpenseSerializer(serializers.ModelSerializer):
 class BudgetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Budget
-        exclude=['user', 'expense','created_at']
+        exclude=['user','created_at']
 
 
 class BudgetDetailSerializer(serializers.ModelSerializer):
@@ -55,35 +53,40 @@ class BudgetListSerializer(serializers.ModelSerializer):
         fields = ['name', 'total_amount']
   
 
-class BudgetWithProgressSerializer(serializers.ModelSerializer):
-    amount_spent = serializers.SerializerMethodField()
-    percentage_spent = serializers.SerializerMethodField()
+class BudgetProgressSerializer(serializers.ModelSerializer):
+    spent_percentage = serializers.SerializerMethodField()
+    remaining_percentage= serializers.SerializerMethodField()
 
     class Meta:
         model = Budget
-        fields = ['name', 'total_amount', 'amount_spent', 'percentage_spent'] 
+        fields = ['name', 'amount_spent', 'total_amount','spent_percentage','remaining_percentage']
 
-    def get_amount_spent(self, obj):
-    
-        total_spent = Transaction.objects.filter(category=obj.name, type='EXPENSE').aggregate(total=Sum('amount'))['total']
-        return total_spent or 0  
+    def get_spent_percentage(self, obj):
+        """Calculate the percentage of the total budget that has been spent"""
+        if obj.total_amount > 0:
+            return (obj.amount_spent / obj.total_amount) * 100
+        return 0
+
+    def get_remaining_percentage(self, obj):
+        """Calculate the remaining percentage of the budget"""
+        return 100 - self.get_spent_percentage(obj)
     # if no expenses are found
 
 
-    def get_percentage_spent(self, obj):
-        # Calculate the percentage of the budget spent
-        amount_spent = self.get_amount_spent(obj)
-        if obj.total_amount > 0:
-            percentage_spent = (amount_spent / obj.total_amount) * 100
-        else:
-            percentage_spent = 0
-        return round(percentage_spent, 2)  
+    # def get_percentage_spent(self, obj):
+    #     # Calculate the percentage of the budget spent
+    #     amount_spent = self.get_amount_spent(obj)
+    #     if obj.total_amount > 0:
+    #         percentage_spent = (amount_spent / obj.total_amount) * 100
+    #     else:
+    #         percentage_spent = 0
+    #     return round(percentage_spent, 2)  
     
-    def get_percentage_left(self, obj):
-        # Calculate the percentage left based on percentage spent
-        percentage_spent = self.get_percentage_spent(obj)
-    # Calculate percentage left
-        return 100 - percentage_spent  
+    # def get_percentage_left(self, obj):
+    #     # Calculate the percentage left based on percentage spent
+    #     percentage_spent = self.get_percentage_spent(obj)
+    # # Calculate percentage left
+    #     return 100 - percentage_spent  
 
 class PreviousMonthBudgetSerializer(serializers.ModelSerializer):
     previous_amount = serializers.SerializerMethodField()
