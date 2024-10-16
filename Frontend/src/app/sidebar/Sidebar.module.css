@@ -3,7 +3,7 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 230px;
+  width: 220px;
   background-color: white;
   transition: all 0.3s ease-in-out;
   display: flex;
@@ -51,28 +51,6 @@
   margin-left: 10px;
 }
 
-/* .navItem {
-  padding: 15px 20px;
-  
-  align-items: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}  */
-
-
-/* .navItem.active {
-  background-color: #e9ecef;
-} */
-
-/* .navItem.active .navText {
-  color: #0072BB;
-  font-weight:600;
-} */
-/* .navItem.active .navText,
-.navItem.active .icon {
-  color: #0072BB;
-  font-weight: 600;
-} */
 
 
 .icon {
