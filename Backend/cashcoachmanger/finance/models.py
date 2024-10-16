@@ -102,13 +102,13 @@ class Transaction(models.Model):
 
  
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # Uncomment this line
-    category = models.ForeignKey(AllCategory,on_delete=models.CASCADE, null=False)
+    category = models.CharField(max_length=255,  null=False) 
     budget = models.ForeignKey(Budget,related_name="transactions", on_delete=models.CASCADE, null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     description = models.TextField()
     transaction_date = models.DateField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE_CHOICES, null=False)  # Add this field
+    transaction_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)  # Add this field
 
     def save(self, *args, **kwargs):
         # check if the transaction is an expense and linked to a budget
