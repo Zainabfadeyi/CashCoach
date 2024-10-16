@@ -5,7 +5,7 @@ from decimal import Decimal
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets,generics
-from .serializers import CategorySerializer,IncomeSerializer,ExpenseSerializer,ExpensesBreakdonwnSerializer,BudgetSerializer,TransactionSerializer,BudgetDetailSerializer,BudgetDashboardSerializer,BudgetListSerializer,BudgetWithProgressSerializer,PreviousMonthBudgetSerializer,BudgetWeeklySpendingSerializer
+from .serializers import CategorySerializer,IncomeSerializer,ExpenseSerializer,ExpensesBreakdonwnSerializer,BudgetSerializer,TransactionSerializer,BudgetDetailSerializer,BudgetDashboardSerializer,BudgetListSerializer,PreviousMonthBudgetSerializer,BudgetWeeklySpendingSerializer,BudgetProgressSerializer
 from rest_framework.decorators import api_view
 from .models import AllCategory, Income, Expense,ExpenseCategory, Budget, Transaction
 from django.db.models import Sum
@@ -30,50 +30,84 @@ class CategoryViewSet(CustomViewSet):
     def get_queryset(self):
         return AllCategory.objects.filter(user=self.request.user)
 
+class IncomeByCategoryView(APIView):
+    def get(self, request):
+        # Fetch income transactions grouped by category
+        income_data = (
+            Transaction.objects
+            .filter(transaction_type='Income')  # Filter by income
+            .values('category__name')  # Group by category name
+            .distinct()  # Get unique category names
+        )
+
+        # Prepare the response
+        categories = [item['category__name'] for item in income_data]
+
+        return Response(categories, status=200)
+    
+class ExpenseByCategoryView(APIView):
+     def get(self, request):
+        # Fetch expense transactions grouped by category
+        expense_data = (
+            Transaction.objects
+            .filter(transaction_type='Expense')  # Filter by expenses
+            .values('category__name')  # Group by category name
+            .distinct()  # Get unique category names
+        )
+
+        # Prepare the response
+        categories = [item['category__name'] for item in expense_data]
+
+        return Response(categories, status=200)
+     
+
+class MonthlyExpenseCategoryView(APIView):
+    def get(self, request):
+        #  current month and year
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+        
+        #  total expenses for the current month
+        total_expenses = (
+            Transaction.objects
+            .filter(transaction_type='Expense', transaction_date__month=current_month, transaction_date__year=current_year)
+            .aggregate(total=Sum('amount'))['total'] or 0  #  total sum of expenses for the month
+        )
+
+        # Fetch expenses by category for the current month, grouped by category
+        expense_data = (
+            Transaction.objects
+            .filter(transaction_type='Expense', transaction_date__month=current_month, transaction_date__year=current_year)
+            .values('category__name')  # Group by category name
+            .annotate(total_amount=Sum('amount'))  # Total amount per category
+            .order_by('-total_amount')  # Order by total amount (descending)
+        )
+
+        # Prepare the response with name, total amount, and percentage
+        chart_data = [
+            {
+                'name': item['category__name'],  # Category name
+                'amount': item['total_amount'],  # Total amount for the category
+                'percentage': (item['total_amount'] / total_expenses) * 100 if total_expenses > 0 else 0  # Percentage of total expenses
+            }
+            for item in expense_data
+        ]
+
+        return Response(chart_data, status=200)
+
 class IncomeViewSet(CustomViewSet):
     serializer_class = IncomeSerializer
     
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
 
-# class DailyIncomeTrendView(APIView):
 
-#     def get(self, request, *args, **kwargs):
-#         # Get today's date
-#         today = now().date()
-
-#         # Get the date range (e.g., the last 30 days)
-        
-#         start_date = today - timedelta(days=30)
-
-#         # Query for daily income (grouping by date)
-#         daily_income = (
-#             Transaction.objects.filter(transaction_type='Income', date__range=[start_date, today])
-#             .values('transaction_date')
-#             .annotate(total_income=Sum('amount'))
-#             .order_by('transaction_date')
-#         )
-
-#         #  data for the chart (x-axis: dates, y-axis: daily income)
-#         tr_dates = []
-#         income_data = []
-
-#         for entry in daily_income:
-#             tr_dates.append(entry['transaction_date'].strftime('%Y-%m-%d'))  # Format date as a string
-#             income_data.append(float(entry['total_income']))
-
-#         # Prepare the response data
-#         chart_data = {
-#             'tr_dates': tr_dates,
-#             'income_data': income_data
-#         }
-
-#         return Response(chart_data)
 class DailyIncomeTrendView(APIView):
     def get(self, request):
-        # Fetch income data, grouped by transaction_date
+        # Fetch income transactions, grouped by transaction_date
         income_data = (
-            Income.objects
+            Transaction.objects
+            .filter(transaction_type='Income')  # Filter by income transaction type
             .values('transaction_date')  # Group by transaction_date
             .annotate(total_income=Sum('amount'))  # Sum amounts for each date
             .order_by('transaction_date')  # Order by transaction_date
@@ -145,9 +179,24 @@ class ExpensesBreakdownView(APIView):
         return Response(category_data, status=200)
 class BudgetViewSet(CustomViewSet):
     serializer_class = BudgetSerializer
-    
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
+        # Return all budgets for the authenticated user
         return Budget.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        # Set the user when creating a new budget
+        serializer.save(user=self.request.user)
+class   DeleteBudgetView(APIView): 
+    def delete(self, request, budget_id=None):
+        try:
+            # Fetch the budget by its ID
+            budget = Budget.objects.get(id=budget_id)
+            budget.delete()  # Delete the budget
+            return Response({"detail": "Budget deleted successfully."}, status=200)
+        except Budget.DoesNotExist:
+            return Response({"detail": "Budget not found."})
     
 class BudgetListView(generics.ListAPIView):
     queryset = Budget.objects.all()  
@@ -165,14 +214,23 @@ class BudgetDetailView(generics.RetrieveAPIView):
         except Budget.DoesNotExist:
             raise NotFound(f"Budget with name '{name}' not found.")
         
+class BudgetProgressAPIView(generics.RetrieveAPIView):
+    serializer_class = BudgetProgressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self):
+        # Fetch the specific budget for the authenticated user and budget ID
+        try:
+            return Budget.objects.get(id=self.kwargs['pk'], user=self.request.user)
+        except Budget.DoesNotExist:
+            raise NotFound("Budget item not found.")  
+        
+            
 class BudgetDashboardView(generics.ListAPIView):
     queryset = Budget.objects.all()
     serializer_class = BudgetDashboardSerializer
     
-class BudgetprogressView(generics.RetrieveAPIView):
-    queryset = Budget.objects.all()
-    serializer_class = BudgetWithProgressSerializer
-    lookup_field = 'id'
+
 
 class WeeklySpendingChartView(generics.GenericAPIView):
     serializer_class = BudgetWeeklySpendingSerializer
@@ -220,13 +278,13 @@ class MonthlyIncomeExpenseView(APIView):
 
             # Query total income for this month
             monthly_income = Transaction.objects.filter(
-                transaction_type='INCOME', 
+                transaction_type='Income', 
                 date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_income=Sum('amount'))['total_income'] or 0
 
             # Query total expenses for this month
             monthly_expense = Transaction.objects.filter(
-                transaction_type='EXPENSE', 
+                transaction_type='Expense', 
                 date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
 
@@ -292,3 +350,16 @@ class TransactionViewSet(CustomViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data,status=201)
+    
+def update_budget_on_transaction(sender, instance, created, **kwargs):
+    # Ensure that the transaction is an expense
+     if created and instance.transaction_type == 'Expense':
+        # Get the budget with a matching name to the category name of the transaction
+        try:
+                    budget = Budget.objects.get(name=instance.category.name)
+            # Update the amount spent in the budget by adding the transaction amount
+                    budget.amount_spent += instance.amount
+                    budget.save()  # Save the updated budget
+        except Budget.DoesNotExist:
+            # No budget with matching name, do nothing
+            pass

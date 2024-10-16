@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.contrib import admin
 from users.views import RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView
 from rest_framework.routers import DefaultRouter
-from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView,ExpensesBreakdownView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,BudgetprogressView,PreviousMonthBudgetView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView
+from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,PreviousMonthBudgetView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView
 
 router = DefaultRouter()
 router.register(r'auth/register', RegisterationViewSet,basename='auth-register')
@@ -46,11 +46,12 @@ urlpatterns = [
     path('api/dashboard/budget-summary', BudgetDashboardView.as_view(), name='budget-summary'),
     path('api/dashboard/monthly-income-expense/', MonthlyIncomeExpenseView.as_view(), name='monthly-income-expense'),
     # path('api/transactions/', TransactionViewSet.as_view(), name='transaction-list'),
-    path('api/sidebar/budgets/', BudgetListView.as_view(), name='budget-list'),
+    path('api/sidebar/budgets-with-totalamount/', BudgetListView.as_view(), name='budget-list'),
+    path('api/budget/<int:pk>/progress/', BudgetProgressAPIView.as_view(), name='budget-progress'),
     path('api/budget/<str:name>/', BudgetDetailView.as_view(), name='budget-detail'),
-    path('api/sidebar/budgets/<int:id>/', BudgetprogressView.as_view(), name='budget-progress'),
+    path('api/delete-budget/<int:budget_id>/', DeleteBudgetView.as_view(), name='delete-budget'),
     path('api/sidebar/previousbudgets/<int:id>/', PreviousMonthBudgetView.as_view(), name='budget-detail'),
-     path('api/sidebar/budgets/weekly-spending/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart')
+    path('api/sidebar/budgets/weekly-spending/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart')
 ]
     
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
