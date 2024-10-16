@@ -18,6 +18,28 @@ import { useSelector } from "../../../api/hook";
 
 const TanStackTable = () => {
   const { fetchTransactions } = useFetchTransactions();
+  const [categoryColors, setCategoryColors] = useState({});
+
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const getColorForCategory = (category) => {
+    if (!categoryColors[category]) {
+      const newColor = generateRandomColor();
+      setCategoryColors((prevColors) => ({
+        ...prevColors,
+        [category]: newColor,
+      }));
+      return newColor;
+    }
+    return categoryColors[category];
+  };
   const columnHelper = createColumnHelper();
   const userId = useSelector((state) => state.auth.user?.id);
 const columns = [
@@ -35,18 +57,35 @@ const columns = [
     cell: (info) => {
       const value = info.getValue();
       const amount = parseFloat(value);
-      return <span>${isNaN(amount) ? '0.00' : amount.toFixed(2)}</span>; // Default to '0.00' if NaN
+      return <span>₦{isNaN(amount) ? '0.00' : amount.toFixed(2)}</span>; // Default to '0.00' if NaN
     },
   }),
+  // columnHelper.accessor("category", {
+  //   header: "Category",
+  //   cell: (info) => {
+  //     const category = info.getValue();
+  //     return (
+  //       <span
+  //         className={styles.categoryCell}
+  //         style={{
+  //           backgroundColor: categoryColors[category] || '#ccc', 
+  //         }}
+  //       >
+  //         {category}
+  //       </span>
+  //     );
+  //   },
+  // }),
   columnHelper.accessor("category", {
     header: "Category",
     cell: (info) => {
       const category = info.getValue();
+      const color = getColorForCategory(category);
       return (
         <span
           className={styles.categoryCell}
           style={{
-            backgroundColor: categoryColors[category] || '#ccc', 
+            backgroundColor: color,
           }}
         >
           {category}
@@ -92,14 +131,7 @@ const table = useReactTable({
   getPaginationRowModel: getPaginationRowModel(),
 });
 
-const categoryColors = {
-  income: '#4caf50', // Green for income
-  Groceries: '#2196F3', // Blue for Groceries
-  Utilities: '#ff9800', // Orange for Utilities
-  Entertainment: '#9C27B0', // Purple for Entertainment
-  Travel: '#E91E63', // Pink for Travel
-  Miscellaneous: '#607D8B', // Blue-gray for Miscellaneous
-};
+
 
 const handleView = (transaction) => {
   console.log('View transaction:', transaction);

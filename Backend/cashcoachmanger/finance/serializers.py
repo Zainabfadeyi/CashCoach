@@ -9,6 +9,13 @@ class CategorySerializer(serializers.ModelSerializer):
         model = AllCategory
         fields = ['id','name','category_type']
 
+    def validate(self, data):
+        # Check if a category with the same name and type already exists 
+        user = self.context['request'].user
+        if AllCategory.objects.filter(user=user, name=data['name'], category_type=data['category_type']).exists():
+            raise serializers.ValidationError("Category with this name and type already exists.")
+        return data
+
 
 def __str__(self):
         return self.name
@@ -27,9 +34,20 @@ class ExpenseSerializer(serializers.ModelSerializer):
         read_only_fields=['user','created_at']
 
 class BudgetSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)  # Use nested serializer
     class Meta:
         model = Budget
         exclude=['user','created_at']
+    def create(self, validated_data):
+        # Check if a budget with the same name already exists for the user
+        user = self.context['request'].user
+        budget_name = validated_data['name'].strip()
+
+        if Budget.objects.filter(name=budget_name, user=user).exists():
+            raise serializers.ValidationError("A budget with this name already exists.")
+
+        # Create the budget if it does not exist
+        return super().create(validated_data)
 
 
 class BudgetDetailSerializer(serializers.ModelSerializer):
@@ -134,34 +152,72 @@ class ExpensesBreakdonwnSerializer(serializers.ModelSerializer):
     percentage = serializers.FloatField()
 
 
+# class TransactionSerializer(serializers.ModelSerializer):
+#     category_type = serializers.ReadOnlyField()
+
+#     class Meta:
+#         model = Transaction
+#         fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
+#         # exclude = ['user']
+
+#     def validate(self, attrs):
+#         category = attrs.get('category', '')
+
+#         # Set category_type to "Income" if the category is "Income", otherwise default to "Expenses"
+#         if category.lower() == "income":
+#             attrs['category_type'] = "Income"
+#         else:
+#             attrs['category_type'] = "Expenses"
+
+#         return attrs
+
+# class TransactionSerializer(serializers.ModelSerializer):
+#     category_type = serializers.ReadOnlyField()
+
+#     class Meta:
+#         model = Transaction
+#         fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
+
+#     def validate(self, attrs):
+#         category_name = attrs.get('category', '').strip()
+
+#         # Validate that the category exists in AllCategory
+#         if not AllCategory.objects.filter(name=category_name).exists():
+#             raise serializers.ValidationError("Category does not exist.")
+
+#         # Set category_type based on the category name
+#         if category_name == "Income":
+#             attrs['category_type'] = "Income"
+#         else:
+#             attrs['category_type'] = "Expenses"
+
+#         return attrs
 class TransactionSerializer(serializers.ModelSerializer):
-    category_type = serializers.ReadOnlyField()
-    category = serializers.ReadOnlyField()
+    category_type = serializers.SerializerMethodField()  # Use SerializerMethodField for dynamic behavior
 
     class Meta:
         model = Transaction
         fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
-        # exclude = ['user']
 
-    # def validate(self, attrs):
-    #     category = attrs.get('category')
+    def validate(self, attrs):
+        category_name = attrs.get('category', '').strip()
 
-    #     if not category:
-    #         raise serializers.ValidationError("Category is required.")
+        # Validate that the category exists in AllCategory
+        if not AllCategory.objects.filter(name=category_name).exists():
+            raise serializers.ValidationError("Category does not exist.")
+    
+        return attrs  # Return validated attributes
 
-    #     # Ensure the category exists and retrieve its type
-    #     if isinstance(category, AllCategory):  # If category is a valid Category instance
-    #         category_type = category.category_type  # Derive the transaction type from the category
+    def get_category_type(self, obj):
+        # Determine category type based on the category name
+        if obj.category_type == "Income":
+            return "Income"
+        return "Expenses"
 
-    #         # Ensure the derived category_type matches the expected category type
-    #         if category_type != category.category_type:
-    #             raise serializers.ValidationError(
-    #                 f"The selected category '{category.name}' is not valid for '{category_type}' transactions."
-    #             )
-    #     else:
-    #         raise serializers.ValidationError("Invalid category data provided.")
-
-    #     return attrs
+    def create(self, validated_data):
+        # Create a Transaction instance
+        transaction = Transaction.objects.create(**validated_data)
+        return transaction
 class TransactionDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction

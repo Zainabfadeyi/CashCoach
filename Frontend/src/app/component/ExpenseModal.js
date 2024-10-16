@@ -161,7 +161,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
   //     amount, 
   //     transaction_date, 
   //     description, 
-  //     category: selectedCategory, // Use selectedCategory for the selected category name
+  //     category: category, // Use category for the selected category name
   //     transaction_type: transactionType 
   //   });
   //   onClose();
@@ -174,7 +174,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
       amount, 
       transaction_date, 
       description, 
-      category: selectedCategory, 
+      category: category, 
       transaction_type: transactionType 
     };
     
@@ -193,7 +193,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
   };
   
 
-  const [selectedCategory, setSelectedCategory] = useState(filteredCategories[0]?.name || ''); // Default selected category
+  const [category, setCategory] = useState(filteredCategories[0]?.name || ''); // Default selected category
 
   if (!isOpen) return null;
 
@@ -257,7 +257,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
               value={category_type}
               onChange={(e) => {
                 setcategory_type(e.target.value);
-                setSelectedCategory(''); // Reset selected category when type changes
+                setCategory(''); // Reset selected category when type changes
               }}
               className={styles.input}
             >
@@ -269,8 +269,8 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
           <div className={styles.formGroup}>
             <label className={styles.label}>Category Name</label>
             <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               className={styles.input}
             >
               {filteredCategories.map((cat) => (
