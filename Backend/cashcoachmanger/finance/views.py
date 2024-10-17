@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from .models import AllCategory, Income, Expense,ExpenseCategory, Budget, Transaction
 from django.db.models import Sum
 import calendar
+from datetime import datetime, timezone
 from django.utils.timezone import now, timedelta,datetime
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
@@ -231,13 +232,10 @@ class BudgetDetailView(generics.RetrieveAPIView):
 class BudgetProgressAPIView(generics.RetrieveAPIView):
     serializer_class = BudgetProgressSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        # Fetch the specific budget for the authenticated user and budget ID
-        try:
-            return Budget.objects.get(id=self.kwargs['pk'], user=self.request.user)
-        except Budget.DoesNotExist:
-            raise NotFound("Budget item not found.")  
+    queryset = Budget.objects.all()
+    lookup_field = 'pk' 
+  
+    
         
             
 class BudgetDashboardView(generics.ListAPIView):
@@ -271,8 +269,20 @@ class WeeklySpendingChartView(generics.GenericAPIView):
 
         return Response(weeks)
 class PreviousMonthBudgetView(generics.ListAPIView):
-    queryset = Budget.objects.all()
     serializer_class = PreviousMonthBudgetSerializer
+
+    def get_queryset(self):
+        # Get today's date and calculate the first day of the previous month
+        today = now()
+        first_day_of_this_month = today.replace(day=1)
+        last_month = first_day_of_this_month - timedelta(days=1)
+        first_day_of_last_month = last_month.replace(day=1)
+
+        # Filter budgets created in the previous month
+        return Budget.objects.filter(
+            created_at__gte=first_day_of_last_month,
+            created_at__lt=first_day_of_this_month
+        )
 
 
 class MonthlyIncomeExpenseView(APIView):
@@ -331,6 +341,8 @@ class TransactionViewSet(CustomViewSet):
         return Response(serializer.data)
 
     def create(self, request):
+        # print("Received data:", request.data)  # Debugging line
+       
         user_id = request.query_params.get('user_id')
         if not user_id:
             return Response({"error": "User ID is required."}, status=400)
@@ -338,10 +350,12 @@ class TransactionViewSet(CustomViewSet):
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
             # Set the user before saving
-            serializer.save(user_id=user_id)
+            transaction = serializer.save(user_id=user_id)
+            # print(f"Transaction created: {transaction} with category_type: {transaction.category_type}")
+
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-    
+   
     def delete(self, request, *args, **kwargs):
         
         pk = kwargs.get('pk')  # Get the pk from URL
@@ -357,15 +371,3 @@ class TransactionViewSet(CustomViewSet):
         self.perform_update(serializer)
         return Response(serializer.data,status=201)
     
-def update_budget_on_transaction(sender, instance, created, **kwargs):
-    # Ensure that the transaction is an expense
-     if created and instance.category_type == 'Expenses':
-        # Get the budget with a matching name to the category name of the transaction
-        try:
-                    budget = Budget.objects.get(name=instance.category.name)
-            # Update the amount spent in the budget by adding the transaction amount
-                    budget.amount_spent += instance.amount
-                    budget.save()  # Save the updated budget
-        except Budget.DoesNotExist:
-            # No budget with matching name, do nothing
-            pass

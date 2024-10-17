@@ -78,16 +78,22 @@ class BudgetProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = Budget
         fields = ['name', 'amount_spent', 'total_amount','spent_percentage','remaining_percentage']
-
     def get_spent_percentage(self, obj):
-        """Calculate the percentage of the total budget that has been spent"""
-        if obj.total_amount > 0:
-            return (obj.amount_spent / obj.total_amount) * 100
-        return 0
+        """Return the spent percentage."""
+        return obj.spent_percentage()  # Ensure this method exists in your model
 
     def get_remaining_percentage(self, obj):
-        """Calculate the remaining percentage of the budget"""
-        return 100 - self.get_spent_percentage(obj)
+        """Return the remaining percentage."""
+        return obj.remaining_percentage()  # Ensure this method exists in your model
+    # def get_spent_percentage(self, obj):
+    #     """Calculate the percentage of the total budget that has been spent"""
+    #     if obj.total_amount > 0:
+    #         return (obj.amount_spent / obj.total_amount) * 100
+    #     return 0
+
+    # def get_remaining_percentage(self, obj):
+    #     """Calculate the remaining percentage of the budget"""
+    #     return 100 - self.get_spent_percentage(obj)
     # if no expenses are found
 
 
@@ -107,38 +113,38 @@ class BudgetProgressSerializer(serializers.ModelSerializer):
     #     return 100 - percentage_spent  
 
 class PreviousMonthBudgetSerializer(serializers.ModelSerializer):
-    previous_amount = serializers.SerializerMethodField()
-    previous_amount_spent = serializers.SerializerMethodField()
     change = serializers.SerializerMethodField()
 
     class Meta:
         model = Budget
-        fields = ['name', 'total_amount', 'previous_amount', 'previous_amount_spent', 'change']  # Fields to be returned
-
+        fields = ['name', 'total_amount', 'amount_spent', 'change']
+    def get_change(self, obj):
+        """Calculate the change as total_amount - amount_spent."""
+        return obj.total_amount - obj.amount_spent
     
-    def get_previous_month_budget(self, obj):
-        #previous month budget amount
-        previous_month = datetime.now().replace(day=1) - timedelta(days=1)
-        month_start = previous_month.replace(day=1)
-        return obj.total_amount 
+    # def get_previous_month_budget(self, obj):
+    #     #previous month budget amount
+    #     previous_month = datetime.now().replace(day=1) - timedelta(days=1)
+    #     month_start = previous_month.replace(day=1)
+    #     return obj.total_amount 
      
-    def get_previous_month_spent(self, obj):
-        previous_month = datetime.now().replace(day=1) - timedelta(days=1)
-        month_start = previous_month.replace(day=1)
-        month_end = previous_month.replace(day=1) + timedelta(days=31)
+    # def get_previous_month_spent(self, obj):
+    #     previous_month = datetime.now().replace(day=1) - timedelta(days=1)
+    #     month_start = previous_month.replace(day=1)
+    #     month_end = previous_month.replace(day=1) + timedelta(days=31)
         
-        total_spent = Transaction.objects.filter(
-            category=obj,
-            type='EXPENSE',
-            date__gte=month_start,
-            date__lt=month_end
-        ).aggregate(total=Sum('amount'))['total']
-        return total_spent or 0 
+    #     total_spent = Transaction.objects.filter(
+    #         category=obj,
+    #         type='EXPENSE',
+    #         date__gte=month_start,
+    #         date__lt=month_end
+    #     ).aggregate(total=Sum('amount'))['total']
+    #     return total_spent or 0 
 
-    def get_previous_month_change(self, obj):
-        previous_budget = self.get_previous_month_budget(obj)
-        previous_spent = self.get_previous_month_spent(obj)
-        return previous_budget - previous_spent
+    # def get_previous_month_change(self, obj):
+    #     previous_budget = self.get_previous_month_budget(obj)
+    #     previous_spent = self.get_previous_month_spent(obj)
+    #     return previous_budget - previous_spent
 
     
 class BudgetWeeklySpendingSerializer(serializers.Serializer):
@@ -193,12 +199,18 @@ class ExpensesBreakdonwnSerializer(serializers.ModelSerializer):
 
 #         return attrs
 class TransactionSerializer(serializers.ModelSerializer):
-    category_type = serializers.SerializerMethodField()  # Use SerializerMethodField for dynamic behavior
+    # category_type = serializers.SerializerMethodField()  # Use SerializerMethodField for dynamic behavior
 
     class Meta:
         model = Transaction
         fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
-
+    
+    
+    def validate_category_type(self, value):
+        if value not in dict(Transaction.TRANSACTION_TYPE_CHOICES):
+            raise serializers.ValidationError("Invalid category type.")
+        return value
+    
     def validate(self, attrs):
         category_name = attrs.get('category', '').strip()
 
@@ -214,10 +226,9 @@ class TransactionSerializer(serializers.ModelSerializer):
             return "Income"
         return "Expenses"
 
+   
     def create(self, validated_data):
-        # Create a Transaction instance
-        transaction = Transaction.objects.create(**validated_data)
-        return transaction
+        return Transaction.objects.create(**validated_data)
 class TransactionDisplaySerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
