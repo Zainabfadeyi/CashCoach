@@ -1,172 +1,164 @@
 // import React, { useEffect, useState } from 'react';
 // import { ProgressBar } from 'react-bootstrap';
+// import axios from '../../../api/axios';
 // import 'bootstrap/dist/css/bootstrap.min.css';
 // import styles from '../../../styles/dashboard.module.css';
-// import { TRANSACTIONS } from '../../mockData'; // Import the mock data directly
-
-// const calculateCategoryTotals = () => {
-//   const categoryTotals = {
-//     Income: 0,
-//     Groceries: 0,
-//     Utilities: 0,
-//     Entertainment: 0,
-//     Travel: 0,
-//     Miscellaneous: 0,
-//   };
-
-//   TRANSACTIONS.forEach(transaction => {
-//     const category = transaction.category; // Adjust if needed based on the structure of your mock data
-//     if (categoryTotals.hasOwnProperty(category)) {
-//       categoryTotals[category] += Math.abs(transaction.amount);
-//     }
-//   });
-
-//   return categoryTotals;
-// };
+// import { useSelector } from '../../../api/hook';
 
 // const ProgressBars = () => {
-//   const [categoryTotals, setCategoryTotals] = useState({
-//     Income: 0,
-//     Groceries: 0,
-//     Utilities: 0,
-//     Entertainment: 0,
-//     Travel: 0,
-//     Miscellaneous: 0,
-//   });
-
-//   useEffect(() => {
-//     const totals = calculateCategoryTotals(); // Use the mock data to calculate totals
-//     setCategoryTotals(totals);
-//   }, []);
-
-//   const totalAmount = Object.values(categoryTotals).reduce((acc, val) => acc + val, 0);
+//   const [categoryData, setCategoryData] = useState([]);
+//   const [totalAmount, setTotalAmount] = useState(0);
+//   const accessToken = useSelector((state) => state.auth.accessToken)
 
 //   const categoryColors = {
-//     Income: 'success',
-//     Groceries: 'info',
-//     Utilities: 'warning',
-//     Entertainment: 'danger',
-//     Travel: 'primary',
-//     Miscellaneous: 'secondary',
+//     Mum: '#28a745',
+//     Dad: '#17a2b8',
+//     Girlfriend: '#ffc107',
+//     Groceries: '#dc3545',
+//     Gifts: '#007bff',
+//     Skincare: '#6c757d',
+//     Travel: '#343a40',
 //   };
 
+//   useEffect(() => {
+//     // Fetch data from the API
+//     axios.get('/dashboard/monthly-expense-breakdown/',
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//         },}
+
+//     )
+//       .then(response => {
+//         const data = response.data;
+        
+//         // Calculate the total amount
+//         const total = data.reduce((acc, item) => acc + item.amount, 0);
+        
+//         setCategoryData(data);
+//         setTotalAmount(total);
+//       })
+//       .catch(error => {
+//         console.error('Error fetching data:', error);
+//       });
+//   }, []);
+
 //   return (
-//     <div className={styles.progress}>
-//       <div style={{ fontSize: "19px", fontWeight: "800" }}>Category Status</div>
-//       <ProgressBar style={{ height: '30px' }}>
-//         {Object.keys(categoryTotals).map((category, index) => {
-//           const percentage = totalAmount > 0 ? (categoryTotals[category] / totalAmount) * 100 : 0;
-//           return (
+//     <div className={styles.progressLine}>
+//       <div>
+//         <div style={{ fontSize: "20px", fontWeight: "700", color:"#1F2C73", paddingBottom:"20px" }}>
+//           Monthly Expenses Breakdown
+//         </div>
+//         <ProgressBar style={{ height: '15px', marginBottom:"20px" }}>
+//           {categoryData.map((item, index) => (
 //             <ProgressBar
 //               key={index}
-//               now={percentage}
-//               variant={categoryColors[category]}
-//               label={`${category} ${percentage.toFixed(2)}%`}
-//               style={{ fontSize: '12px' }}
+//               now={item.percentage}
+//               style={{ backgroundColor: categoryColors[item.name] || '#ccc' }}
+//               isChild
 //             />
-//           );
-//         })}
-//       </ProgressBar>
+//           ))}
+//         </ProgressBar>
+//       </div>
+
+//       <div className={styles.categoryList}>
+//         {categoryData.map((item, index) => (
+//           <div key={index} className={styles.OverallPrg} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', color:"#7184AD" }}>
+//             <div
+//               style={{
+//                 display: 'inline-block',
+//                 width: '15px',
+//                 height: '15px',
+//                 borderRadius: '50%',
+//                 backgroundColor: categoryColors[item.name] || '#ccc',
+//                 marginRight: '10px',
+//                 border: "1px solid #c5c5c5",
+//                 padding: "7px"
+//               }}
+//             />
+//             <span style={{ fontWeight: 'bold', flexGrow: 1 }}>{item.name}</span>
+//             <span style={{ marginLeft: '10px', fontSize:"18px" }}>₦{item.amount.toFixed(2)}</span>
+//             <span style={{ marginLeft: '10px', fontWeight:"900", fontSize:"18px" }}>{item.percentage.toFixed(2)}%</span>
+//           </div>
+//         ))}
+//       </div>
 //     </div>
 //   );
 // };
 
 // export default ProgressBars;
+
 import React, { useEffect, useState } from 'react';
 import { ProgressBar } from 'react-bootstrap';
+import axios from '../../../api/axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../../../styles/dashboard.module.css';
-import { TRANSACTIONS } from '../../mockData';
-
-const calculateCategoryTotals = () => {
-  const categoryTotals = {
-    Income: 0,
-    Groceries: 0,
-    Utilities: 0,
-    Entertainment: 0,
-    Travel: 0,
-    Miscellaneous: 0,
-  };
-
-  TRANSACTIONS.forEach(transaction => {
-    const category = transaction.category;
-    if (categoryTotals.hasOwnProperty(category)) {
-      categoryTotals[category] += Math.abs(transaction.amount);
-    }
-  });
-
-  return categoryTotals;
-};
+import { useSelector } from '../../../api/hook';
 
 const ProgressBars = () => {
-  const [categoryTotals, setCategoryTotals] = useState({
-    Income: 0,
-    Groceries: 0,
-    Utilities: 0,
-    Entertainment: 0,
-    Travel: 0,
-    Miscellaneous: 0,
-  });
+  const [categoryData, setCategoryData] = useState([]);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const accessToken = useSelector((state) => state.auth.accessToken);
+
+  // Define a set of colors to cycle through dynamically
+  const colorPalette = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#007bff', '#6c757d', '#343a40', '#8e44ad', '#e74c3c', '#f39c12'];
 
   useEffect(() => {
-    const totals = calculateCategoryTotals();
-    setCategoryTotals(totals);
-  }, []);
-
-  const totalAmount = Object.values(categoryTotals).reduce((acc, val) => acc + val, 0);
-
-  const categoryColors = {
-    Income: '#28a745',
-    Groceries: '#17a2b8',
-    Utilities: '#ffc107',
-    Entertainment: '#dc3545',
-    Travel: '#007bff',
-    Miscellaneous: '#6c757d',
-  };
+    // Fetch data from the API
+    axios.get('/dashboard/monthly-expense-breakdown/', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    .then(response => {
+      const data = response.data.slice(0, 6); // Limit to first 6 items
+      const total = data.reduce((acc, item) => acc + item.amount, 0);
+      setCategoryData(data);
+      setTotalAmount(total);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+    });
+  }, [accessToken]);
 
   return (
     <div className={styles.progressLine}>
       <div>
-      <div style={{ fontSize: "20px", fontWeight: "700", color:"#1F2C73", paddingBottom:"20px"}}>Monthly Expenses Breakdown</div>
-      <ProgressBar style={{ height: '15px', marginBottom:"20px" }}>
-        {Object.keys(categoryTotals).map((category, index) => {
-          const percentage = totalAmount > 0 ? (categoryTotals[category] / totalAmount) * 100 : 0;
-          return (
+        <div style={{ fontSize: "20px", fontWeight: "700", color: "#1F2C73", paddingBottom: "20px" }}>
+          Monthly Expenses Breakdown
+        </div>
+        <ProgressBar style={{ height: '15px', marginBottom: "20px" }}>
+          {categoryData.map((item, index) => (
             <ProgressBar
               key={index}
-              now={percentage}
-              style={{ backgroundColor: categoryColors[category] }}
+              now={item.percentage}
+              style={{ backgroundColor: colorPalette[index % colorPalette.length] }}
               isChild
             />
-          );
-        })}
-      </ProgressBar>
+          ))}
+        </ProgressBar>
       </div>
 
-         <div className={styles.categoryList} >
-        {Object.keys(categoryTotals).map((category, index) => {
-          const amount = categoryTotals[category];
-          const percentage = totalAmount > 0 ? (amount / totalAmount) * 100 : 0;
-          return (
-            <div key={index} className={styles.OverallPrg} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' , color:"#7184AD"}}>
-              <div
-                style={{
-                  display: 'inline-block',
-                  width: '15px',
-                  height: '15px',
-                  borderRadius: '50%',
-                  backgroundColor: categoryColors[category],
-                  marginRight: '10px',
-                  border: "1px solid #c5c5c5",
-                  padding: "7px"
-                }}
-              />
-              <span style={{ fontWeight: 'bold', flexGrow: 1 }}>{category}</span>
-              <span style={{ marginLeft: '10px',fontSize:"18px" }}>₦{amount.toFixed(2)}</span>
-              <span style={{ marginLeft: '10px', fontWeight:"900",fontSize:"18px"  }}>{percentage.toFixed(2)}%</span>
-            </div>
-          );
-        })}
+      <div className={styles.categoryList}>
+        {categoryData.map((item, index) => (
+          <div key={index} className={styles.OverallPrg} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', color: "#7184AD" }}>
+            <div
+              style={{
+                display: 'inline-block',
+                width: '15px',
+                height: '15px',
+                borderRadius: '50%',
+                backgroundColor: colorPalette[index % colorPalette.length],
+                marginRight: '10px',
+                border: "1px solid #c5c5c5",
+                padding: "7px"
+              }}
+            />
+            <span style={{ fontWeight: 'bold', flexGrow: 1 }}>{item.name}</span>
+            <span style={{ marginLeft: '10px', fontSize: "18px" }}>₦{item.amount.toFixed(2)}</span>
+            <span style={{ marginLeft: '10px', fontWeight: "900", fontSize: "18px" }}>{item.percentage.toFixed(2)}%</span>
+          </div>
+        ))}
       </div>
     </div>
   );
