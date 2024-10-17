@@ -13,16 +13,17 @@ class AllCategory(models.Model):
  
     CATEGORY_TYPE_CHOICES = [
         ("Income", 'Income'),
-        ("Expense", 'Expense'),
+        ("Expenses", 'Expenses'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     category_type = models.CharField(
-        max_length=7,
+        max_length=255,
         choices=CATEGORY_TYPE_CHOICES,
         null =False
     )
+    
 
     def __str__(self):
         return f"{self.name} ({self.category_type})"
@@ -38,42 +39,80 @@ class Income(models.Model):
     def __str__(self):
         return f"{self.source}: {self.amount}"
   
+# class Budget(models.Model):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     name = models.CharField(max_length=255)
+#     category = models.ForeignKey(AllCategory, on_delete=models.CASCADE , null=False)
+#     # expense = models.ForeignKey(id, on_delete=models.CASCADE, null=True, blank=True)
+#     total_amount = models.DecimalField(max_digits=12,decimal_places=2,null=False)
+#     amount_spent = models.DecimalField(max_digits=12, decimal_places=2, null=False)
+#     start_date = models.DateField(null=False)
+#     end_date = models.DateField(null=False)
+#     created_at = models.DateTimeField(auto_now_add=True)
+
+#     @property
+
+#     def percentage_spent(self):
+#         # Calculate the percentage spent based on the total amount
+#         if self.total_amount > 0:
+#             return (self.amount_spent / self.total_amount) * 100
+#         return 0
+
+#     def __str__(self):
+#         return self.name
+    
+
+#     def save(self, *args, **kwargs):
+#         # Check if the category exists in the Category model (for expenses)
+#         if not AllCategory.objects.filter(name=self.category.name).exists():
+#             # Automatically create the category if it does not exist
+#             AllCategory.objects.create(name=self.category.name)
+
+#         super(Budget, self).save(*args, **kwargs)
+
+#     def __str__(self):
+#         return f"{self.user.username} - {self.category.name} Budget: {self.amount} from {self.start_date} to {self.end_date}"
+
+    
+#     # Expenses model
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(AllCategory, on_delete=models.CASCADE)
-    # expense = models.ForeignKey(id, on_delete=models.CASCADE, null=True, blank=True)
-    total_amount = models.DecimalField(max_digits=12,decimal_places=2,null=False)
+    category = models.ForeignKey(AllCategory, on_delete=models.CASCADE, null=False)
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     amount_spent = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     start_date = models.DateField(null=False)
     end_date = models.DateField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property
-
     def percentage_spent(self):
         # Calculate the percentage spent based on the total amount
         if self.total_amount > 0:
             return (self.amount_spent / self.total_amount) * 100
         return 0
 
-    def __str__(self):
-        return self.name
-    
-
     def save(self, *args, **kwargs):
-        # Check if the category exists in the Category model (for expenses)
-        if not AllCategory.objects.filter(name=self.category.name).exists():
-            # Automatically create the category if it does not exist
-            AllCategory.objects.create(name=self.category.name)
+        # Check if the category name exists in AllCategory for this user
+        category_name = self.name.strip()  # Use the budget name as the category name
 
-        super(Budget, self).save(*args, **kwargs)
+        all_category = AllCategory.objects.filter(name=category_name, user=self.user).first()
+        
+        # If no category found, create a new category with type "Expenses"
+        if not all_category:
+            all_category = AllCategory.objects.create(
+                name=category_name,
+                category_type="Expenses",  # Default to Expenses
+                user=self.user
+            )
+        
+        # Assign the category to the budget
+        self.category = all_category
+        super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.username} - {self.category.name} Budget: {self.amount} from {self.start_date} to {self.end_date}"
+        return f"{self.user.username} - {self.category.name} Budget: {self.total_amount} from {self.start_date} to {self.end_date}"
 
-    
-    # Expenses model
 class Expense(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(AllCategory, on_delete=models.CASCADE)
@@ -95,7 +134,7 @@ class ExpenseCategory(models.Model):
 
 
 class Transaction(models.Model):
-    category_TYPE_CHOICES = [
+    TRANSACTION_TYPE_CHOICES = [
         ("Income", "Income"),
         ("Expenses", "Expenses"),
     ]
@@ -108,11 +147,11 @@ class Transaction(models.Model):
     description = models.TextField()
     transaction_date = models.DateField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    category_type = models.CharField(max_length=255, choices=category_TYPE_CHOICES, null=False)  # Add this field
+    category_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)  # Add this field
 
     def save(self, *args, **kwargs):
         # check if the transaction is an expense and linked to a budget
-        if self.category_type == 'expense' and self.budget:
+        if self.category_type == 'Expenses' and self.budget:
             #  find a budget that matches the category, if none provided
             if not self.budget:
                 try:
@@ -123,10 +162,7 @@ class Transaction(models.Model):
             if self.budget and self.category == self.budget.category:
                 # add the expense amount to the budget spent amount
                 self.budget.spent_amount = F('spent_amount') + self.amount
-        # Set category_type based on category before saving
-        self.category_type = "Income" if self.category == "Income" else "Expenses"
-        if self.category:
-            self.category_type = self.category.category_type
+       
         super().save(*args, **kwargs)
 
     def __str__(self):

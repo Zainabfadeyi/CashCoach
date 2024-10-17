@@ -40,7 +40,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/transactions/${selectedMonth}/`
+        const response = await axios.get(`/dashboard/total-expenses/${selectedMonth}`
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -63,7 +63,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/transactions/${selectedIncomeMonth}/`
+        const response = await axios.get(`/dashboard/total-income/${selectedIncomeMonth}`
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,

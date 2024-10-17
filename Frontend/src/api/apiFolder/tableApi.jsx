@@ -8,11 +8,12 @@ export const useFetchTransactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const apiUrl = `/transactions/`;
+      const apiUrl = `/transactions/?user_id=${userId}`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
+
       });
       return response.data;
     } catch (error) {

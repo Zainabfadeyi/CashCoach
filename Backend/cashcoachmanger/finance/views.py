@@ -1,4 +1,4 @@
-from datetime import timezone
+from datetime import timezone,timedelta
 from django.shortcuts import render
 from django.db.models import F
 from decimal import Decimal
@@ -35,7 +35,7 @@ class IncomeByCategoryView(APIView):
         # Fetch income transactions grouped by category
         income_data = (
             Transaction.objects
-            .filter(transaction_type='Income')  # Filter by income
+            .filter(category_type='Income')  # Filter by income
             .values('category__name')  # Group by category name
             .distinct()  # Get unique category names
         )
@@ -50,7 +50,7 @@ class ExpenseByCategoryView(APIView):
         # Fetch expense transactions grouped by category
         expense_data = (
             Transaction.objects
-            .filter(transaction_type='Expense')  # Filter by expenses
+            .filter(category_type='Expense')  # Filter by expenses
             .values('category__name')  # Group by category name
             .distinct()  # Get unique category names
         )
@@ -61,6 +61,7 @@ class ExpenseByCategoryView(APIView):
         return Response(categories, status=200)
      
 
+
 class MonthlyExpenseCategoryView(APIView):
     def get(self, request):
         #  current month and year
@@ -70,15 +71,15 @@ class MonthlyExpenseCategoryView(APIView):
         #  total expenses for the current month
         total_expenses = (
             Transaction.objects
-            .filter(transaction_type='Expense', transaction_date__month=current_month, transaction_date__year=current_year)
+            .filter(category_type='Expenses', transaction_date__month=current_month, transaction_date__year=current_year)
             .aggregate(total=Sum('amount'))['total'] or 0  #  total sum of expenses for the month
         )
 
         # Fetch expenses by category for the current month, grouped by category
         expense_data = (
             Transaction.objects
-            .filter(transaction_type='Expense', transaction_date__month=current_month, transaction_date__year=current_year)
-            .values('category__name')  # Group by category name
+            .filter(category_type='Expenses', transaction_date__month=current_month, transaction_date__year=current_year)
+            .values('category')  # Group by category name
             .annotate(total_amount=Sum('amount'))  # Total amount per category
             .order_by('-total_amount')  # Order by total amount (descending)
         )
@@ -86,7 +87,7 @@ class MonthlyExpenseCategoryView(APIView):
         # Prepare the response with name, total amount, and percentage
         chart_data = [
             {
-                'name': item['category__name'],  # Category name
+                'name': item['category'],  # Category name
                 'amount': item['total_amount'],  # Total amount for the category
                 'percentage': (item['total_amount'] / total_expenses) * 100 if total_expenses > 0 else 0  # Percentage of total expenses
             }
@@ -107,7 +108,7 @@ class DailyIncomeTrendView(APIView):
         # Fetch income transactions, grouped by transaction_date
         income_data = (
             Transaction.objects
-            .filter(transaction_type='Income')  # Filter by income transaction type
+            .filter(category_type='Income')  # Filter by income transaction type
             .values('transaction_date')  # Group by transaction_date
             .annotate(total_income=Sum('amount'))  # Sum amounts for each date
             .order_by('transaction_date')  # Order by transaction_date
@@ -122,26 +123,39 @@ class DailyIncomeTrendView(APIView):
             for item in income_data
         ]
         return Response(chart_data, status=200)
-    
+
+class TotalExpensesView(APIView):
+
+    def get(self, request, month, year=None, *args, **kwargs):
+        if not year:
+            year = datetime.now().year  # Default to current year if not provided
+
+        # Calculate the total sum of all expense transactions for the specified month and year
+        total_expenses = Transaction.objects.filter(
+            category_type='Expenses',
+            transaction_date__month=month,
+            transaction_date__year=year
+        ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
+
+        # Return the total as a JSON response
+        return Response({'total_expenses': float(total_expenses)})
 class TotalIncomeView(APIView):
     
-    def get(self, request, *args, **kwargs):
-        # Aggregate the sum of all income transactions
-        total_income = Transaction.objects.filter(transaction_type='Income').aggregate(total_income=Sum('amount'))['total_income'] or 0
+    def get(self, request, month, *args, **kwargs):
+        # Get the current year or the specified year if you want to filter by year
+        year = datetime.now().year
+
+        # Aggregate the sum of all income transactions for the specified month
+        total_income = Transaction.objects.filter(
+            category_type='Income',
+            transaction_date__month=month,
+            transaction_date__year=year  # Optionally filter by year
+        ).aggregate(total_income=Sum('amount'))['total_income'] or 0
 
         # Prepare the response
         return Response({
             'total_income': float(total_income)  # Return total income as a float
         })
-class TotalExpensesView(APIView):
-
-    def get(self, request, *args, **kwargs):
-        user_id = request.query_params.get('user_id')
-        # Calculate the total sum of all expense transactions
-        total_expenses = Transaction.objects.filter(transaction_type='Expenses').aggregate(total=Sum('amount'))['total'] or 0
-
-        # Return the total as a JSON response
-        return Response({'total_expenses': float(total_expenses)})
 
 class ExpenseViewSet(CustomViewSet):
     serializer_class = ExpenseSerializer
@@ -248,7 +262,7 @@ class WeeklySpendingChartView(generics.GenericAPIView):
             total_spent = Transaction.objects.filter(
                 date__gte=week_start,
                 date__lt=week_end,
-                transaction_type='EXPENSE'
+                category_type='Expenses'
             ).aggregate(total=Sum('amount'))['total'] or 0
             weeks.append({
                 'week_start': week_start,
@@ -262,50 +276,42 @@ class PreviousMonthBudgetView(generics.ListAPIView):
 
 
 class MonthlyIncomeExpenseView(APIView):
-    
+
     def get(self, request, *args, **kwargs):
-        months = []
-        income_data = []
-        expense_data = []
+        monthly_data = {}
 
-        # Get today's date
+        # Get today's date and start from the current month
         today = now().date()
+        start_month = today.replace(day=1)
 
-        # Loop through the last 10 months
-        for i in range(10, 0, -1):
-            first_day_of_month = (today.replace(day=1) - timezone.timedelta(days=30 * i)).replace(day=1)
+        # Loop through the current month and the last 11 months (totaling 12 months)
+        for i in range(0, 12):
+            # Calculate the first and last day of each month
+            first_day_of_month = (start_month - timedelta(days=30 * i)).replace(day=1)
             last_day_of_month = first_day_of_month.replace(day=calendar.monthrange(first_day_of_month.year, first_day_of_month.month)[1])
 
             # Query total income for this month
             monthly_income = Transaction.objects.filter(
-                transaction_type='Income', 
-                date__range=[first_day_of_month, last_day_of_month]
+                category_type='Income', 
+                transaction_date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_income=Sum('amount'))['total_income'] or 0
 
             # Query total expenses for this month
             monthly_expense = Transaction.objects.filter(
-                transaction_type='Expense', 
-                date__range=[first_day_of_month, last_day_of_month]
+                category_type='Expenses', 
+                transaction_date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
 
-            # Format the month name (e.g., "Jan 2024")
+            # Format the month name (e.g., "Oct 2024")
             month_name = first_day_of_month.strftime('%b %Y')
 
-            # Append results for this month
-            months.append(month_name)
-            income_data.append(float(monthly_income))
-            expense_data.append(float(monthly_expense))
+            # Add data to the monthly_data dictionary with the month as a key
+            monthly_data[month_name] = {
+                'income_data': float(monthly_income),
+                'expense_data': float(monthly_expense)
+            }
 
-        # Prepare the data for the chart
-        chart_data = {
-            'months': months,
-            'income_data': income_data,
-            'expense_data': expense_data
-        }
-
-        return Response(chart_data)
-    
-
+        return Response(monthly_data)
 class TransactionViewSet(CustomViewSet):
     lookup_field = 'pk' 
     permission_classes = [IsAuthenticated]
@@ -353,7 +359,7 @@ class TransactionViewSet(CustomViewSet):
     
 def update_budget_on_transaction(sender, instance, created, **kwargs):
     # Ensure that the transaction is an expense
-     if created and instance.transaction_type == 'Expense':
+     if created and instance.category_type == 'Expenses':
         # Get the budget with a matching name to the category name of the transaction
         try:
                     budget = Budget.objects.get(name=instance.category.name)
