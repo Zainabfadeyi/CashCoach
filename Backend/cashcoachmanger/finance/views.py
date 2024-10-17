@@ -5,13 +5,14 @@ from decimal import Decimal
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets,generics
-from .serializers import CategorySerializer,IncomeSerializer,ExpenseSerializer,ExpensesBreakdonwnSerializer,BudgetSerializer,TransactionSerializer,BudgetDetailSerializer,BudgetDashboardSerializer,BudgetListSerializer,PreviousMonthBudgetSerializer,BudgetWeeklySpendingSerializer,BudgetProgressSerializer
+from .serializers import CategorySerializer,IncomeSerializer,ExpenseSerializer,ExpensesBreakdonwnSerializer,BudgetSerializer,TransactionSerializer,BudgetDetailSerializer,BudgetDashboardSerializer,BudgetListSerializer,BudgetWeeklySpendingSerializer,BudgetProgressSerializer
 from rest_framework.decorators import api_view
 from .models import AllCategory, Income, Expense,ExpenseCategory, Budget, Transaction
 from django.http import JsonResponse
 from django.db.models import Count, Sum
 from datetime import datetime, timedelta
 import calendar
+import datetime
 from datetime import datetime, timezone
 from django.utils.timezone import now, timedelta,datetime
 from rest_framework.response import Response
@@ -197,6 +198,7 @@ class ExpensesBreakdownView(APIView):
 class BudgetViewSet(CustomViewSet):
     serializer_class = BudgetSerializer
     permission_classes = [IsAuthenticated]
+    
 
     def get_queryset(self):
         # Return all budgets for the authenticated user
@@ -270,22 +272,6 @@ class WeeklySpendingChartView(generics.GenericAPIView):
             })
 
         return Response(weeks)
-class PreviousMonthBudgetView(generics.ListAPIView):
-    serializer_class = PreviousMonthBudgetSerializer
-
-    def get_queryset(self):
-        # Get today's date and calculate the first day of the previous month
-        today = now()
-        first_day_of_this_month = today.replace(day=1)
-        last_month = first_day_of_this_month - timedelta(days=1)
-        first_day_of_last_month = last_month.replace(day=1)
-
-        # Filter budgets created in the previous month
-        return Budget.objects.filter(
-            created_at__gte=first_day_of_last_month,
-            created_at__lt=first_day_of_this_month
-        )
-
 
 class MonthlyIncomeExpenseView(APIView):
 
@@ -351,12 +337,18 @@ class TransactionViewSet(CustomViewSet):
 
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
-            # Set the user before saving
             transaction = serializer.save(user_id=user_id)
-            # print(f"Transaction created: {transaction} with category_type: {transaction.category_type}")
-
             return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        # return Response(serializer.errors, status=400)
+        transaction = self.get_object()
+
+        # Try to update the matching budget (this is handled by the signal)
+        try:
+            budget = Budget.objects.get(name=transaction.category)
+            serializer = BudgetSerializer(budget)
+            return Response(serializer.data, status=200)
+        except Budget.DoesNotExist:
+            return Response({"detail": "Budget not found"}, status=400)
    
     def delete(self, request, *args, **kwargs):
         
@@ -373,34 +365,43 @@ class TransactionViewSet(CustomViewSet):
         self.perform_update(serializer)
         return Response(serializer.data,status=201)
  
-def analytics_overview(request):
-    # Total Transactions
-    total_transactions = Transaction.objects.count()
+class AnalyticsView(APIView):
+    
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        today = datetime.now().date()
+  
+        # Total income and expenses for the that day
+        total_income_today = Transaction.objects.filter(
+            user=user, 
+            category_type='Income', 
+            transaction_date=today
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        total_expense_today = Transaction.objects.filter(
+            user=user, 
+            category_type='Expenses', 
+            transaction_date=today
+        ).aggregate(total=Sum('amount'))['total'] or 0
+
+        # Daily average total income + total expense/2
+        total_today = total_income_today + total_expense_today
+        daily_average = total_today / 2 if total_today > 0 else 0
+
+        # Total number of categories and transactions
+        total_transactions = Transaction.objects.count()
 
     # Total Categories
-    total_categories = AllCategory.objects.count()
+        total_categories = AllCategory.objects.count()
 
-    # Daily Average Transactions
-    # Assuming you have a 'created_at' or similar timestamp field in the Transaction model
-    today = datetime.now()
-    past_week = today - timedelta(days=7)
-    last_seven_days_transactions = Transaction.objects.filter(created_at__gte=past_week)
-    
-    if last_seven_days_transactions.exists():
-        daily_average = last_seven_days_transactions.count() / 7
-    else:
-        daily_average = 0
+        # Prepare the response data
+        analytics_data = {
+            "daily_average": daily_average,
+            "total_categories": total_categories,
+            "total_transactions": total_transactions,
+        }
 
-    # Create the response dictionary
-    data = {
-        'total_transactions': total_transactions,
-        'total_categories': total_categories,
-        'daily_average_transactions': daily_average,
-    }
-
-    # Return the data as JSON
-    return JsonResponse(data)
-
+        return Response(analytics_data)
 
 def income_overview(request):
     # Get the current month
@@ -410,10 +411,10 @@ def income_overview(request):
     # Fetch income transactions for the current month
     income_transactions = Transaction.objects.filter(
         created_at__gte=first_day_of_month,
-        category_type='Income'  # Ensure you have a way to identify income transactions
+        category_type='Income' 
     ).values('category', 'amount')
 
-    # Calculate the total income for percentage calculation
+    # Calculate the total income for percentage 
     total_income = sum(item['amount'] for item in income_transactions)
 
     # Prepare the response data
@@ -439,7 +440,7 @@ def income_transactions(request):
     # Prepare the response data
     transactions_data = [
         {
-            'id': transaction.id,  # Assuming you want to return the transaction ID
+            'id': transaction.id,  
             'category': transaction.category,
             'amount': transaction.amount,
             'category_type': transaction.category_type,
