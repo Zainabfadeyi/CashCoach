@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.db.models import F
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 # Create your models here.
 User = get_user_model()
@@ -78,6 +80,7 @@ class Income(models.Model):
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
+    transaction = models.ForeignKey()
     category = models.ForeignKey(AllCategory, on_delete=models.CASCADE, null=False)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     amount_spent = models.DecimalField(max_digits=12, decimal_places=2, null=False)
@@ -85,13 +88,15 @@ class Budget(models.Model):
     end_date = models.DateField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    @property
-    def percentage_spent(self):
+    # @property
+    def spent_percentage(self):
         # Calculate the percentage spent based on the total amount
         if self.total_amount > 0:
             return (self.amount_spent / self.total_amount) * 100
         return 0
-
+    # @property
+    def remaining_percentage(self):
+        return 100 - self.spent_percentage()
     def save(self, *args, **kwargs):
         # Check if the category name exists in AllCategory for this user
         category_name = self.name.strip()  # Use the budget name as the category name
@@ -139,41 +144,26 @@ class Transaction(models.Model):
         ("Expenses", "Expenses"),
     ]
 
- 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)  # Uncomment this line
-    category = models.CharField(max_length=255,  null=False) 
-    budget = models.ForeignKey(Budget,related_name="transactions", on_delete=models.CASCADE, null=True, blank=True)
-    amount = models.DecimalField(max_digits=12, decimal_places=2, null=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.CharField(max_length=255, null=False)
+    budget = models.ForeignKey(Budget, related_name="transactions", on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField()
     transaction_date = models.DateField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    category_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)  # Add this field
-
+    category_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)
     def save(self, *args, **kwargs):
-        # check if the transaction is an expense and linked to a budget
-        if self.category_type == 'Expenses' and self.budget:
-            #  find a budget that matches the category, if none provided
-            if not self.budget:
+        super().save(*args, **kwargs)  # Save the transaction first
+        # Check if the transaction is marked as an expense and linked to a budget
+        if self.category_type == 'Expenses':
+            if self.budget:
                 try:
-                    self.budget = Budget.objects.get(category=self.category)
-                except Budget.DoesNotExist:
-                    raise ValueError(f"No budget exists for category {self.category}")
-            # check if the category of the expense matches the budget category
-            if self.budget and self.category == self.budget.category:
-                # add the expense amount to the budget spent amount
-                self.budget.spent_amount = F('spent_amount') + self.amount
-       
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.category_type} of {self.amount} in {self.category} on {self.transaction_date}"
-    
-     
-
-# automatically update amount_spent in Budget when a Transaction is created
-# @receiver(post_save, sender=Transaction)
-def update_budget_amount_spent(sender, instance, **kwargs):
-    budget = instance.budget
-    total_spent = sum(transaction.amount for transaction in budget.transactions.all())
-    budget.amount_spent = total_spent
-    budget.save()
+                    print(f"Updating budget: {self.budget.name} with amount: {self.amount}")
+                    self.budget.amount_spent += self.amount
+                    print(f"New amount_spent: {self.budget.amount_spent}")
+                    self.budget.save()
+                except Exception as e:
+                    print(f"Error updating budget: {e}")
+        #     else:
+        #         # print("Transaction does not have a budget linked.")
+        # else:
+        #     print("Transaction is not an expense.")

@@ -8,8 +8,11 @@ from rest_framework import viewsets,generics
 from .serializers import CategorySerializer,IncomeSerializer,ExpenseSerializer,ExpensesBreakdonwnSerializer,BudgetSerializer,TransactionSerializer,BudgetDetailSerializer,BudgetDashboardSerializer,BudgetListSerializer,PreviousMonthBudgetSerializer,BudgetWeeklySpendingSerializer,BudgetProgressSerializer
 from rest_framework.decorators import api_view
 from .models import AllCategory, Income, Expense,ExpenseCategory, Budget, Transaction
-from django.db.models import Sum
+from django.http import JsonResponse
+from django.db.models import Count, Sum
+from datetime import datetime, timedelta
 import calendar
+from datetime import datetime, timezone
 from django.utils.timezone import now, timedelta,datetime
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
@@ -231,13 +234,10 @@ class BudgetDetailView(generics.RetrieveAPIView):
 class BudgetProgressAPIView(generics.RetrieveAPIView):
     serializer_class = BudgetProgressSerializer
     permission_classes = [IsAuthenticated]
-
-    def get_object(self):
-        # Fetch the specific budget for the authenticated user and budget ID
-        try:
-            return Budget.objects.get(id=self.kwargs['pk'], user=self.request.user)
-        except Budget.DoesNotExist:
-            raise NotFound("Budget item not found.")  
+    queryset = Budget.objects.all()
+    lookup_field = 'pk' 
+  
+    
         
             
 class BudgetDashboardView(generics.ListAPIView):
@@ -271,8 +271,20 @@ class WeeklySpendingChartView(generics.GenericAPIView):
 
         return Response(weeks)
 class PreviousMonthBudgetView(generics.ListAPIView):
-    queryset = Budget.objects.all()
     serializer_class = PreviousMonthBudgetSerializer
+
+    def get_queryset(self):
+        # Get today's date and calculate the first day of the previous month
+        today = now()
+        first_day_of_this_month = today.replace(day=1)
+        last_month = first_day_of_this_month - timedelta(days=1)
+        first_day_of_last_month = last_month.replace(day=1)
+
+        # Filter budgets created in the previous month
+        return Budget.objects.filter(
+            created_at__gte=first_day_of_last_month,
+            created_at__lt=first_day_of_this_month
+        )
 
 
 class MonthlyIncomeExpenseView(APIView):
@@ -331,6 +343,8 @@ class TransactionViewSet(CustomViewSet):
         return Response(serializer.data)
 
     def create(self, request):
+        # print("Received data:", request.data)  # Debugging line
+       
         user_id = request.query_params.get('user_id')
         if not user_id:
             return Response({"error": "User ID is required."}, status=400)
@@ -338,10 +352,12 @@ class TransactionViewSet(CustomViewSet):
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
             # Set the user before saving
-            serializer.save(user_id=user_id)
+            transaction = serializer.save(user_id=user_id)
+            # print(f"Transaction created: {transaction} with category_type: {transaction.category_type}")
+
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-    
+   
     def delete(self, request, *args, **kwargs):
         
         pk = kwargs.get('pk')  # Get the pk from URL
@@ -356,16 +372,83 @@ class TransactionViewSet(CustomViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data,status=201)
+ 
+def analytics_overview(request):
+    # Total Transactions
+    total_transactions = Transaction.objects.count()
+
+    # Total Categories
+    total_categories = AllCategory.objects.count()
+
+    # Daily Average Transactions
+    # Assuming you have a 'created_at' or similar timestamp field in the Transaction model
+    today = datetime.now()
+    past_week = today - timedelta(days=7)
+    last_seven_days_transactions = Transaction.objects.filter(created_at__gte=past_week)
     
-def update_budget_on_transaction(sender, instance, created, **kwargs):
-    # Ensure that the transaction is an expense
-     if created and instance.category_type == 'Expenses':
-        # Get the budget with a matching name to the category name of the transaction
-        try:
-                    budget = Budget.objects.get(name=instance.category.name)
-            # Update the amount spent in the budget by adding the transaction amount
-                    budget.amount_spent += instance.amount
-                    budget.save()  # Save the updated budget
-        except Budget.DoesNotExist:
-            # No budget with matching name, do nothing
-            pass
+    if last_seven_days_transactions.exists():
+        daily_average = last_seven_days_transactions.count() / 7
+    else:
+        daily_average = 0
+
+    # Create the response dictionary
+    data = {
+        'total_transactions': total_transactions,
+        'total_categories': total_categories,
+        'daily_average_transactions': daily_average,
+    }
+
+    # Return the data as JSON
+    return JsonResponse(data)
+
+
+def income_overview(request):
+    # Get the current month
+    today = datetime.now()
+    first_day_of_month = today.replace(day=1)
+
+    # Fetch income transactions for the current month
+    income_transactions = Transaction.objects.filter(
+        created_at__gte=first_day_of_month,
+        category_type='Income'  # Ensure you have a way to identify income transactions
+    ).values('category', 'amount')
+
+    # Calculate the total income for percentage calculation
+    total_income = sum(item['amount'] for item in income_transactions)
+
+    # Prepare the response data
+    income_data = []
+    for transaction in income_transactions:
+        percentage = (transaction['amount'] / total_income * 100) if total_income > 0 else 0
+        income_data.append({
+            'category': transaction['category'],
+            'amount': transaction['amount'],
+            'percentage': percentage
+        })
+
+    # Return the data as JSON
+    return JsonResponse(income_data, safe=False)
+
+
+
+
+def income_transactions(request):
+    # Fetch all transactions where category_type is 'Income'
+    transactions = Transaction.objects.filter(category_type='Income')
+
+    # Prepare the response data
+    transactions_data = [
+        {
+            'id': transaction.id,  # Assuming you want to return the transaction ID
+            'category': transaction.category,
+            'amount': transaction.amount,
+            'category_type': transaction.category_type,
+            'transaction_date':transaction.transaction_date,
+            'created_at': transaction.created_at, 
+        }
+        for transaction in transactions
+    ]
+
+    # Return the data as JSON
+    return JsonResponse(transactions_data, safe=False)
+
