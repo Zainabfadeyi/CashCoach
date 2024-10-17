@@ -37,7 +37,7 @@ class BudgetSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)  # Use nested serializer
     class Meta:
         model = Budget
-        exclude=['user','created_at']
+        exclude=['user','created_at','transaction']
     def create(self, validated_data):
         # Check if a budget with the same name already exists for the user
         user = self.context['request'].user
@@ -85,66 +85,7 @@ class BudgetProgressSerializer(serializers.ModelSerializer):
     def get_remaining_percentage(self, obj):
         """Return the remaining percentage."""
         return obj.remaining_percentage()  # Ensure this method exists in your model
-    # def get_spent_percentage(self, obj):
-    #     """Calculate the percentage of the total budget that has been spent"""
-    #     if obj.total_amount > 0:
-    #         return (obj.amount_spent / obj.total_amount) * 100
-    #     return 0
-
-    # def get_remaining_percentage(self, obj):
-    #     """Calculate the remaining percentage of the budget"""
-    #     return 100 - self.get_spent_percentage(obj)
-    # if no expenses are found
-
-
-    # def get_percentage_spent(self, obj):
-    #     # Calculate the percentage of the budget spent
-    #     amount_spent = self.get_amount_spent(obj)
-    #     if obj.total_amount > 0:
-    #         percentage_spent = (amount_spent / obj.total_amount) * 100
-    #     else:
-    #         percentage_spent = 0
-    #     return round(percentage_spent, 2)  
-    
-    # def get_percentage_left(self, obj):
-    #     # Calculate the percentage left based on percentage spent
-    #     percentage_spent = self.get_percentage_spent(obj)
-    # # Calculate percentage left
-    #     return 100 - percentage_spent  
-
-class PreviousMonthBudgetSerializer(serializers.ModelSerializer):
-    change = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Budget
-        fields = ['name', 'total_amount', 'amount_spent', 'change']
-    def get_change(self, obj):
-        """Calculate the change as total_amount - amount_spent."""
-        return obj.total_amount - obj.amount_spent
-    
-    # def get_previous_month_budget(self, obj):
-    #     #previous month budget amount
-    #     previous_month = datetime.now().replace(day=1) - timedelta(days=1)
-    #     month_start = previous_month.replace(day=1)
-    #     return obj.total_amount 
      
-    # def get_previous_month_spent(self, obj):
-    #     previous_month = datetime.now().replace(day=1) - timedelta(days=1)
-    #     month_start = previous_month.replace(day=1)
-    #     month_end = previous_month.replace(day=1) + timedelta(days=31)
-        
-    #     total_spent = Transaction.objects.filter(
-    #         category=obj,
-    #         type='EXPENSE',
-    #         date__gte=month_start,
-    #         date__lt=month_end
-    #     ).aggregate(total=Sum('amount'))['total']
-    #     return total_spent or 0 
-
-    # def get_previous_month_change(self, obj):
-    #     previous_budget = self.get_previous_month_budget(obj)
-    #     previous_spent = self.get_previous_month_spent(obj)
-    #     return previous_budget - previous_spent
 
     
 class BudgetWeeklySpendingSerializer(serializers.Serializer):

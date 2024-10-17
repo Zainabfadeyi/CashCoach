@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.contrib import admin
 from users.views import RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView
 from rest_framework.routers import DefaultRouter
-from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,PreviousMonthBudgetView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,analytics_overview,income_overview,income_transactions
+from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,AnalyticsView,income_overview,income_transactions
 
 router = DefaultRouter()
 router.register(r'auth/register', RegisterationViewSet,basename='auth-register')
@@ -50,11 +50,10 @@ urlpatterns = [
     path('api/budget/<int:pk>/progress/', BudgetProgressAPIView.as_view(), name='budget-progress'),
     path('api/budget/<str:name>/', BudgetDetailView.as_view(), name='budget-detail'),
     path('api/delete-budget/<int:budget_id>/', DeleteBudgetView.as_view(), name='delete-budget'),
-    path('api/sidebar/previousbudgets/<int:id>/', PreviousMonthBudgetView.as_view(), name='budget-detail'),
     path('api/sidebar/budgets/weekly-spending/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart'),
-    
+
     # ANALYTICS PAGE
-    path('analytics/overview/', analytics_overview, name='analytics_overview'),
+    path('api/analytics/overview/', AnalyticsView.as_view(), name='analytics_overview'),
     path('income/overview/', income_overview, name='income_overview'),
    path('income/transactions/', income_transactions, name='income_transactions'),
 ]

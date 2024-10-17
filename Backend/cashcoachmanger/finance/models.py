@@ -41,46 +41,54 @@ class Income(models.Model):
     def __str__(self):
         return f"{self.source}: {self.amount}"
   
-# class Budget(models.Model):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE)
-#     name = models.CharField(max_length=255)
-#     category = models.ForeignKey(AllCategory, on_delete=models.CASCADE , null=False)
-#     # expense = models.ForeignKey(id, on_delete=models.CASCADE, null=True, blank=True)
-#     total_amount = models.DecimalField(max_digits=12,decimal_places=2,null=False)
-#     amount_spent = models.DecimalField(max_digits=12, decimal_places=2, null=False)
-#     start_date = models.DateField(null=False)
-#     end_date = models.DateField(null=False)
-#     created_at = models.DateTimeField(auto_now_add=True)
 
-#     @property
+class Transaction(models.Model):
+    TRANSACTION_TYPE_CHOICES = [
+        ("Income", "Income"),
+        ("Expenses", "Expenses"),
+    ]
 
-#     def percentage_spent(self):
-#         # Calculate the percentage spent based on the total amount
-#         if self.total_amount > 0:
-#             return (self.amount_spent / self.total_amount) * 100
-#         return 0
-
-#     def __str__(self):
-#         return self.name
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    category = models.CharField(max_length=255, null=False)
+    amount = models.DecimalField(max_digits=12, decimal_places=2 ,null=False)
+    description = models.TextField()
+    transaction_date = models.DateField(null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    category_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)
     
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Save the transaction first
+  
+        # Only update budgets for expenses
+        if self.category_type == "Expenses":
+            try:
+                # Find the corresponding budget where the name matches the category
+                budget = Budget.objects.get(name=self.category, user=self.user)
 
-#     def save(self, *args, **kwargs):
-#         # Check if the category exists in the Category model (for expenses)
-#         if not AllCategory.objects.filter(name=self.category.name).exists():
-#             # Automatically create the category if it does not exist
-#             AllCategory.objects.create(name=self.category.name)
+                # Calculate the potential new amount_spent
+                new_amount_spent = budget.amount_spent + self.amount
 
-#         super(Budget, self).save(*args, **kwargs)
+                # Check if the new amount exceeds the budget's total amount
+                if new_amount_spent > budget.total_amount:
+                    exceeded_amount = new_amount_spent - budget.total_amount
+                    # Notify the user about the exceeded amount
+                    print(f"You have exceeded your budget by {exceeded_amount:.2f}.")  # Change to appropriate notification method
 
-#     def __str__(self):
-#         return f"{self.user.username} - {self.category.name} Budget: {self.amount} from {self.start_date} to {self.end_date}"
+                # Update the budget's amount_spent regardless
+                budget.amount_spent += self.amount
+                budget.transaction = self  # Link the transaction to the budget
+                budget.save()
 
+            except Budget.DoesNotExist:
+                # Handle cases where no matching budget is found
+                pass
     
 #     # Expenses model
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    category = models.ForeignKey(AllCategory, on_delete=models.CASCADE, null=False)
+    transaction = models.ForeignKey('Transaction', related_name="budget",on_delete=models.CASCADE,null=False)
+    category = models.ForeignKey(AllCategory, on_delete=models.CASCADE, null=True, blank=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     amount_spent = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     start_date = models.DateField(null=False)
@@ -135,36 +143,3 @@ class ExpenseCategory(models.Model):
 
     def __str__(self):
         return self.name
-
-
-class Transaction(models.Model):
-    TRANSACTION_TYPE_CHOICES = [
-        ("Income", "Income"),
-        ("Expenses", "Expenses"),
-    ]
-
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    category = models.CharField(max_length=255, null=False)
-    amount = models.DecimalField(max_digits=12, decimal_places=2 ,null=False)
-    budget = models.ForeignKey(Budget, related_name="transactions", on_delete=models.CASCADE, null=True, blank=True)
-    description = models.TextField()
-    transaction_date = models.DateField(null=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    category_type = models.CharField(max_length=255, choices=TRANSACTION_TYPE_CHOICES, null=False)
-    
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Save the transaction first
-        # Check if the transaction is marked as an expense and linked to a budget
-        if self.category_type == 'Expenses':
-            if self.budget:
-                try:
-                    print(f"Updating budget: {self.budget.name} with amount: {self.amount}")
-                    self.budget.amount_spent += self.amount
-                    print(f"New amount_spent: {self.budget.amount_spent}")
-                    self.budget.save()
-                except Exception as e:
-                    print(f"Error updating budget: {e}")
-        #     else:
-        #         # print("Transaction does not have a budget linked.")
-        # else:
-        #     print("Transaction is not an expense.")
