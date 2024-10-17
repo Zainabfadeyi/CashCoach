@@ -117,10 +117,10 @@ class DailyIncomeTrendView(APIView):
             .order_by('transaction_date')  # Order by transaction_date
         )
 
-        # Prepare the response
+       # Prepare the response with formatted dates
         chart_data = [
             {
-                'date': str(item['transaction_date']), 
+                'date': datetime.strptime(str(item['transaction_date']), '%Y-%m-%d').strftime('%b %d'), 
                 'total_income': item['total_income'] or 0  # Use 0 if total_income is None
             }
             for item in income_data
