@@ -8,7 +8,9 @@ from rest_framework import viewsets,generics
 from .serializers import CategorySerializer,IncomeSerializer,ExpenseSerializer,ExpensesBreakdonwnSerializer,BudgetSerializer,TransactionSerializer,BudgetDetailSerializer,BudgetDashboardSerializer,BudgetListSerializer,PreviousMonthBudgetSerializer,BudgetWeeklySpendingSerializer,BudgetProgressSerializer
 from rest_framework.decorators import api_view
 from .models import AllCategory, Income, Expense,ExpenseCategory, Budget, Transaction
-from django.db.models import Sum
+from django.http import JsonResponse
+from django.db.models import Count, Sum
+from datetime import datetime, timedelta
 import calendar
 from datetime import datetime, timezone
 from django.utils.timezone import now, timedelta,datetime
@@ -370,4 +372,83 @@ class TransactionViewSet(CustomViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data,status=201)
+ 
+def analytics_overview(request):
+    # Total Transactions
+    total_transactions = Transaction.objects.count()
+
+    # Total Categories
+    total_categories = AllCategory.objects.count()
+
+    # Daily Average Transactions
+    # Assuming you have a 'created_at' or similar timestamp field in the Transaction model
+    today = datetime.now()
+    past_week = today - timedelta(days=7)
+    last_seven_days_transactions = Transaction.objects.filter(created_at__gte=past_week)
     
+    if last_seven_days_transactions.exists():
+        daily_average = last_seven_days_transactions.count() / 7
+    else:
+        daily_average = 0
+
+    # Create the response dictionary
+    data = {
+        'total_transactions': total_transactions,
+        'total_categories': total_categories,
+        'daily_average_transactions': daily_average,
+    }
+
+    # Return the data as JSON
+    return JsonResponse(data)
+
+
+def income_overview(request):
+    # Get the current month
+    today = datetime.now()
+    first_day_of_month = today.replace(day=1)
+
+    # Fetch income transactions for the current month
+    income_transactions = Transaction.objects.filter(
+        created_at__gte=first_day_of_month,
+        category_type='Income'  # Ensure you have a way to identify income transactions
+    ).values('category', 'amount')
+
+    # Calculate the total income for percentage calculation
+    total_income = sum(item['amount'] for item in income_transactions)
+
+    # Prepare the response data
+    income_data = []
+    for transaction in income_transactions:
+        percentage = (transaction['amount'] / total_income * 100) if total_income > 0 else 0
+        income_data.append({
+            'category': transaction['category'],
+            'amount': transaction['amount'],
+            'percentage': percentage
+        })
+
+    # Return the data as JSON
+    return JsonResponse(income_data, safe=False)
+
+
+
+
+def income_transactions(request):
+    # Fetch all transactions where category_type is 'Income'
+    transactions = Transaction.objects.filter(category_type='Income')
+
+    # Prepare the response data
+    transactions_data = [
+        {
+            'id': transaction.id,  # Assuming you want to return the transaction ID
+            'category': transaction.category,
+            'amount': transaction.amount,
+            'category_type': transaction.category_type,
+            'transaction_date':transaction.transaction_date,
+            'created_at': transaction.created_at, 
+        }
+        for transaction in transactions
+    ]
+
+    # Return the data as JSON
+    return JsonResponse(transactions_data, safe=False)
+
