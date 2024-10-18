@@ -105,28 +105,54 @@ class IncomeViewSet(CustomViewSet):
     
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
-
+from datetime import datetime, timedelta
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.db.models import Sum
+from .models import Transaction  # Adjust this import based on your project structure
 
 class DailyIncomeTrendView(APIView):
     def get(self, request):
-        # Fetch income transactions, grouped by transaction_date
+        today = datetime.now().date()
+        start_date = today - timedelta(days=11) 
+         # Get the date 11 days before today (12 days total)
+
+        # Fetch income transactions for the last 12 days of the month, grouped by transaction_date
         income_data = (
             Transaction.objects
-            .filter(category_type='Income')  # Filter by income transaction type
-            .values('transaction_date')  # Group by transaction_date
-            .annotate(total_income=Sum('amount'))  # Sum amounts for each date
-            .order_by('transaction_date')  # Order by transaction_date
+            .filter(category_type='Income', transaction_date__gte=start_date)
+                # Filter for the last 12 days
+            .values('transaction_date') 
+              # Group by transaction_date
+            .annotate(total_income=Sum('amount')) 
+              # Sum amounts for each date
+            .order_by('transaction_date') 
+              # Order by transaction_date
         )
 
-       # Prepare the response with formatted dates
+        # Prepare the response with formatted dates
         chart_data = [
             {
-                'date': datetime.strptime(str(item['transaction_date']), '%Y-%m-%d').strftime('%b %d'), 
+                'date': datetime.strptime(str(item['transaction_date']), '%Y-%m-%d').strftime('%b %d'),
                 'total_income': item['total_income'] or 0  # Use 0 if total_income is None
             }
             for item in income_data
         ]
-        return Response(chart_data, status=200)
+
+        # Calculate the total amount of income across the last 12 days
+        total_income = sum(item['total_income'] for item in chart_data)
+
+        # Prepare the final response data
+        response_data = {
+            'total_income': total_income,
+                # Total income for the last 12 days
+            'daily_income_trend': chart_data, 
+              # Daily income data
+        }
+
+        return Response(response_data, status=200)
+
+
 
 class TotalExpensesView(APIView):
 
@@ -250,28 +276,29 @@ class BudgetDashboardView(generics.ListAPIView):
 class WeeklySpendingChartView(generics.GenericAPIView):
     serializer_class = BudgetWeeklySpendingSerializer
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request, budget_id, *args, **kwargs):
         today = datetime.now().date()
-        # Get data for the last 30 days
-        start_date = today - timedelta(days=30)
+        # Get data for the last 12 days
+        start_date = today - timedelta(days=11)  # This includes today + 11 previous days
 
-        # A list of weekly intervals
-        weeks = []
-        for i in range(5):  # 5 weeks
-            week_start = start_date + timedelta(days=i * 7)
-            week_end = week_start + timedelta(days=7)
+        # A list of daily intervals for spending
+        daily_spending = []
+        
+        for i in range(12):  # Loop through the last 12 days
+            day = start_date + timedelta(days=i)
             total_spent = Transaction.objects.filter(
-                transaction_date__gte=week_start,
-                transaction_date__lt=week_end,
-                category_type='Expenses'
+                transaction_date__gte=day,
+                transaction_date__lt=day + timedelta(days=1),
+                category_type='Expenses',
+                budget__id=budget_id  # Use budget__id instead of budget_id
             ).aggregate(total=Sum('amount'))['total'] or 0
             
-            weeks.append({
-                'week_start': week_start,
+            daily_spending.append({
+                'day': day.strftime('%Y-%m-%d'),  # Format the date for easier reading
                 'amount_spent': total_spent
             })
 
-        return Response(weeks)
+        return Response(daily_spending, status=200)
     
 class MonthlyIncomeExpenseView(APIView):
 
