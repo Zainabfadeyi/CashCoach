@@ -1,12 +1,15 @@
 from rest_framework import viewsets,status,generics
-from .serializers import RegisterationSerializer,LoginSerializer,ProfileUpdateSerializer
+from .serializers import RegisterationSerializer,LoginSerializer
 from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.permissions import IsAuthenticated
 from .serializers import CustomUserSerializer
+from .models import CustomUser,PasswordResetOTP
+from django.core.mail import send_mail
     
 class RegisterationViewSet(viewsets.ModelViewSet):
     serializer_class = RegisterationSerializer
@@ -39,6 +42,8 @@ class LoginViewSet(viewsets.ModelViewSet):
         except TokenError as e:
             raise InvalidToken(e.args[0])
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
 class RefreshViewset(viewsets.ViewSet,TokenRefreshView):
     http_method_names = ('post')
     def create(self, request, *args, **kwargs):
@@ -58,12 +63,67 @@ class UserDetailsView(viewsets.ViewSet):
         serializer = CustomUserSerializer(user)  # Serialize user data
         return Response(serializer.data, status=status.HTTP_200_OK)  # Return user details
 
-class ProfileUpdateViewSet(viewsets.ModelViewSet):
-    serializer_class = ProfileUpdateSerializer
-    permission_classes = [IsAuthenticated]
-    
-    def get_object(self):
-        return self.request.user  # Get the authenticated user
+    # Define the queryset to get the profile associated with the logged-in user
+    def get_queryset(self):
+        return CustomUserSerializer.objects.filter(user=self.request.user)
 
-    def perform_update(self, serializer):
-        serializer.save()  # Save the updated user data
+    # Override the retrieve method to get the profile of the logged-in user
+    def retrieve(self, request, *args, **kwargs):
+        profile = self.get_queryset().first()  # Get the user's profile
+        if profile:
+            serializer = self.get_serializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Profile not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({"message": "Profile updated successfully!"}, status=status.HTTP_200_OK)
+
+
+
+class PasswordResetRequestView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = CustomUser.objects.get(email=email)
+            otp_instance, created = PasswordResetOTP.objects.get_or_create(user=user)
+            otp_instance.generate_otp()
+
+            # Send OTP to user's email
+            send_mail(
+                'Your OTP for Password Reset',
+                f'Your OTP is: {otp_instance.otp}',
+                'from@example.com',
+                [email],
+                fail_silently=False,
+            )
+
+            return Response({"message": "OTP sent to your email!"}, status=status.HTTP_200_OK)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Email not found."}, status=status.HTTP_404_NOT_FOUND)
+class PasswordResetConfirmationView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        otp = request.data.get('otp')
+        new_password = request.data.get('new_password')
+
+        try:
+            user = CustomUser.objects.get(email=email)
+            otp_instance = PasswordResetOTP.objects.get(user=user)
+
+            if otp_instance.otp == otp:
+                user.set_password(new_password)
+                user.save()
+                otp_instance.delete()  # Optionally delete the OTP after use
+                return Response({"message": "Password reset successfully!"}, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+        except CustomUser.DoesNotExist:
+            return Response({"error": "Email not found."}, status=status.HTTP_404_NOT_FOUND)
+        except PasswordResetOTP.DoesNotExist:
+            return Response({"error": "No OTP found."}, status=status.HTTP_404_NOT_FOUND)

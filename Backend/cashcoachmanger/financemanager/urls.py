@@ -18,9 +18,9 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from django.contrib import admin
-from users.views import RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView,ProfileUpdateViewSet
+from users.views import RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView,PasswordResetRequestView, PasswordResetConfirmationView
 from rest_framework.routers import DefaultRouter
-from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,AnalyticsView,income_overview,income_transactions,expense_transactions,expense_overview
+from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,AnalyticsView,IncomeOverviewView,income_transactions,expense_transactions,ExpenseOverviewView,IncomeandExpenseProgressView
 
 router = DefaultRouter()
 router.register(r'auth/register', RegisterationViewSet,basename='auth-register')
@@ -30,7 +30,6 @@ router.register(r'categories', CategoryViewSet,basename='categories')
 router.register(r'budgets', BudgetViewSet,basename='budgets')
 router.register(r'incomes', IncomeViewSet,basename='incomes')
 router.register(r'expenses', ExpenseViewSet,basename='expenses')
-router.register(r'profile', ProfileUpdateViewSet, basename='profile')
 router.register(r'transactions', TransactionViewSet, basename='transaction')
 
 
@@ -38,7 +37,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/', include((router.urls, "api"))), 
     path("api/user/details/", UserDetailsView.as_view({'get': 'list'}), name='user-details'),
-    path("api/profile/details/", ProfileUpdateViewSet.as_view({'get': 'list','put': 'update'}), name='user-details'),
+     path('api/password-reset/', PasswordResetRequestView.as_view(), name='password_reset_request'),
+    path('api/password-reset/confirm/', PasswordResetConfirmationView.as_view(), name='password_reset_confirm'),
     path("api/transactions/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
     path("api/transactions/<int:pk>/", TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
     path('api/dashboard/total-income/<int:month>', TotalIncomeView.as_view(), name='total-income'),
@@ -58,8 +58,9 @@ urlpatterns = [
 
     # ANALYTICS PAGE
     path('api/analytics/overview/', AnalyticsView.as_view(), name='analytics_overview'),
-    path('income/overview/', income_overview, name='income_overview'),
-    path('expenses/overview/', expense_overview, name='expense_overview'),
+    path('api/income-overview/', IncomeOverviewView.as_view(), name='income_overview'),
+    path('api/expenses-overview/',ExpenseOverviewView.as_view(), name='expense_overview'),
+    path('api/income-expense-Progress/',IncomeandExpenseProgressView.as_view(), name='expense_overview'),
    path('income/transactions/', income_transactions, name='income_transactions'),
    path('expenses/transactions/', expense_transactions, name='expense_transactions'),
 ]

@@ -12,7 +12,7 @@ class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'email']
+        fields = ['id', 'username', 'email','last_name','first_name']
         
 class RegisterationSerializer(serializers.Serializer):
     first_name = serializers.CharField()
@@ -21,7 +21,17 @@ class RegisterationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password1 = serializers.CharField(write_only=True, style={'input_type': 'password'})
     password2 = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    
+    def validate(self, data):
+        # Ensure that first_name, last_name, and username are provided
+        if not data.get('first_name'):
+            raise serializers.ValidationError("First name is required")
+        if not data.get('last_name'):
+            raise serializers.ValidationError("Last name is required")
+        if not data.get('username'):
+            raise serializers.ValidationError("Username is required")
 
+        return data
     def validate(self, data):
         form = UserForm(data)
         if not form.is_valid():
@@ -60,8 +70,3 @@ class LoginSerializer(TokenObtainPairSerializer):
             raise ValidationError('Invalid email/password')
 
         return data
-
-class ProfileUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['username', 'email','password']
