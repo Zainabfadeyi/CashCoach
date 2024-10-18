@@ -58,11 +58,13 @@ urlpatterns = [
 
     # ANALYTICS PAGE
     path('api/analytics/overview/', AnalyticsView.as_view(), name='analytics_overview'),
+
     path('api/income-overview/', IncomeOverviewView.as_view(), name='income_overview'),
     path('api/expenses-overview/',ExpenseOverviewView.as_view(), name='expense_overview'),
     path('api/income-expense-Progress/',IncomeandExpenseProgressView.as_view(), name='expense_overview'),
    path('income/transactions/', income_transactions, name='income_transactions'),
    path('expenses/transactions/', expense_transactions, name='expense_transactions'),
+
 ]
     
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
