@@ -27,15 +27,16 @@ export const SideBarData = [
     iconClosed: <RiArrowDownSFill />,
     iconOpened: <RiArrowUpSFill />,
     subNav: [
-      { title: 'Overview',
-        path: '/analytics' },
+     
       { title: 'Income', 
         path: '/income' },
-        { title: 'Expenses', 
-          path: '/expenses' },
+
+    { title: 'Expenses', 
+      path: '/expenses' },
       { title: 'Inc vs Exp', 
         path: '/IncxExp' ,
       }
+      
     ]
   }
 ];
