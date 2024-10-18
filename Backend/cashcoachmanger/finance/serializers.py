@@ -99,46 +99,7 @@ class ExpensesBreakdonwnSerializer(serializers.ModelSerializer):
     percentage = serializers.FloatField()
 
 
-# class TransactionSerializer(serializers.ModelSerializer):
-#     category_type = serializers.ReadOnlyField()
 
-#     class Meta:
-#         model = Transaction
-#         fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
-#         # exclude = ['user']
-
-#     def validate(self, attrs):
-#         category = attrs.get('category', '')
-
-#         # Set category_type to "Income" if the category is "Income", otherwise default to "Expenses"
-#         if category.lower() == "income":
-#             attrs['category_type'] = "Income"
-#         else:
-#             attrs['category_type'] = "Expenses"
-
-#         return attrs
-
-# class TransactionSerializer(serializers.ModelSerializer):
-#     category_type = serializers.ReadOnlyField()
-
-#     class Meta:
-#         model = Transaction
-#         fields = ['id', 'category_type', 'category', 'amount', 'description', 'transaction_date', 'created_at']
-
-#     def validate(self, attrs):
-#         category_name = attrs.get('category', '').strip()
-
-#         # Validate that the category exists in AllCategory
-#         if not AllCategory.objects.filter(name=category_name).exists():
-#             raise serializers.ValidationError("Category does not exist.")
-
-#         # Set category_type based on the category name
-#         if category_name == "Income":
-#             attrs['category_type'] = "Income"
-#         else:
-#             attrs['category_type'] = "Expenses"
-
-#         return attrs
 class TransactionSerializer(serializers.ModelSerializer):
     # category_type = serializers.SerializerMethodField()  # Use SerializerMethodField for dynamic behavior
 
