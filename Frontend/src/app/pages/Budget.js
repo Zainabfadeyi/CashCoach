@@ -362,26 +362,11 @@ const Budget = () => {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#1F2C73' }}>
-                <div>{selectedBudget.spent_percentage}</div>
-                <div>{selectedBudget.remaining_percentage}</div>
+                <div>{selectedBudget.spent_percentage}%</div>
+                <div>{selectedBudget.remaining_percentage}%</div>
               </div>
             </div>
-{/* 
-            <div className={styles.update}>
-              <div>
-                <div style={{ fontSize: '17px', color: '#1F2C73', marginBottom: '10px' }}>Last Month</div>
-                <div style={{ fontSize: '22px', fontWeight: '700', color: '#1F2C73', marginBottom: '10px' }}>₦60,000</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '17px', color: '#1F2C73', marginBottom: '10px' }}>Expenses</div>
-                <div style={{ fontSize: '22px', fontWeight: '700', color: '#1F2C73', marginBottom: '10px' }}>₦50,000</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '17px', color: '#1F2C73', marginBottom: '10px' }}>Change</div>
-                <div style={{ fontSize: '22px', fontWeight: '700', color: '#1F2C73', marginBottom: '10px' }}>₦10,000</div>
-              </div>
-            </div> */}
-            <BudgetLineChart />
+            <BudgetLineChart budgetId={selectedBudget.id} />
           </>
         ) : (
           <div>Please select a budget to view details.</div>

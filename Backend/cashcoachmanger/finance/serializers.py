@@ -77,7 +77,7 @@ class BudgetProgressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Budget
-        fields = ['name', 'amount_spent', 'total_amount','spent_percentage','remaining_percentage']
+        fields = ['id','name', 'amount_spent', 'total_amount','spent_percentage','remaining_percentage']
     def get_spent_percentage(self, obj):
         """Return the spent percentage."""
         return obj.spent_percentage()  # Ensure this method exists in your model

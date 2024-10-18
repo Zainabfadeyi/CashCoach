@@ -250,6 +250,7 @@ class BudgetListView(generics.ListAPIView):
 class BudgetDetailView(generics.RetrieveAPIView):
     queryset = Budget.objects.all()
     serializer_class = BudgetDetailSerializer
+    
     lookup_field = 'name'
 
     def get_object(self):
@@ -273,6 +274,7 @@ class BudgetDashboardView(generics.ListAPIView):
     serializer_class = BudgetDashboardSerializer
     
 
+
 class WeeklySpendingChartView(generics.GenericAPIView):
     serializer_class = BudgetWeeklySpendingSerializer
 
@@ -293,8 +295,9 @@ class WeeklySpendingChartView(generics.GenericAPIView):
                 budget__id=budget_id  # Use budget__id instead of budget_id
             ).aggregate(total=Sum('amount'))['total'] or 0
             
+            # Format the date as 'Oct 7', 'Oct 8', etc.
             daily_spending.append({
-                'day': day.strftime('%Y-%m-%d'),  # Format the date for easier reading
+                'day': day.strftime('%b %d'),  # Format the date as abbreviated month and day
                 'amount_spent': total_spent
             })
 
@@ -487,6 +490,7 @@ def income_transactions(request):
         {
             'id': transaction.id,  
             'category': transaction.category,
+            'description':transaction.description,
             'amount': transaction.amount,
             'category_type': transaction.category_type,
             'transaction_date':transaction.transaction_date,
@@ -508,6 +512,7 @@ def expense_transactions(request):
         {
             'id': transaction.id,  
             'category': transaction.category,
+            'description':transaction.description,
             'amount': transaction.amount,
             'category_type': transaction.category_type,
             'transaction_date':transaction.transaction_date,
