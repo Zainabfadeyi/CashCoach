@@ -77,7 +77,7 @@ const Categories = () => {
 
  
   const incomeCategories = categories.filter(category => category.category_type === 'Income');
-  const expenseCategories = categories.filter(category => category.category_type === 'Expense');
+  const expenseCategories = categories.filter(category => category.category_type === 'Expenses');
 
   return (
     <div className={styles.Categories}>
@@ -118,9 +118,9 @@ const Categories = () => {
         </div>
 
         <div className={styles.IncExp}>
-          <div style={{ fontSize: '18px', marginBottom: '15px', color:"#1F2C73", fontWeight:"600"}}>Expense Categories</div>
+          <div style={{ fontSize: '18px', marginBottom: '15px', color:"#1F2C73", fontWeight:"600"}}>Expenses Categories</div>
           {expenseCategories.map((category, index) => (
-            <div key={`Expense-${index}`} style={{ width: '100%' }}>
+            <div key={`Expenses-${index}`} style={{ width: '100%' }}>
               <div className={styles.IncExpCon}>
                 <div style={{ fontSize: '27px', color: '#c5c5c5', fontWeight: '700' }}>
                   <LuEqual />

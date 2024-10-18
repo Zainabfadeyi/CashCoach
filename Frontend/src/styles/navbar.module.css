@@ -68,3 +68,24 @@
       margin-right: 45px;
      
   }
+  /* Add this to your navbar.module.css */
+.dropdown {
+  position: absolute;
+  top: 60px; /* Adjust based on your layout */
+  right: 10px; /* Adjust based on your layout */
+  background-color: white; /* Change this to match your design */
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  z-index: 1000; /* Ensure it's above other elements */
+}
+
+.dropdownItem {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #1F2C73; /* Change as per your theme */
+}
+
+.dropdownItem:hover {
+  background-color: #f1f1f1; /* Change for hover effect */
+}
