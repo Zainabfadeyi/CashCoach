@@ -99,11 +99,11 @@ class Budget(models.Model):
     def spent_percentage(self):
         # Calculate the percentage spent based on the total amount
         if self.total_amount > 0:
-            return (self.amount_spent / self.total_amount) * 100
+            return round((self.amount_spent / self.total_amount) * 100,2)
         return 0
     # @property
     def remaining_percentage(self):
-        return 100 - self.spent_percentage()
+          return round(100 - self.spent_percentage(), 2) 
     def save(self, *args, **kwargs):
         # Check if the category name exists in AllCategory for this user
         category_name = self.name.strip()  # Use the budget name as the category name

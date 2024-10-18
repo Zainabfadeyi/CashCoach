@@ -93,7 +93,7 @@ class MonthlyExpenseCategoryView(APIView):
             {
                 'name': item['category'],  # Category name
                 'amount': item['total_amount'],  # Total amount for the category
-                'percentage': (item['total_amount'] / total_expenses) * 100 if total_expenses > 0 else 0  # Percentage of total expenses
+                'percentage': round((item['total_amount'] / total_expenses) * 100 ,2)if total_expenses > 0 else 0  # Percentage of total expenses
             }
             for item in expense_data
         ]
@@ -105,11 +105,6 @@ class IncomeViewSet(CustomViewSet):
     
     def get_queryset(self):
         return Income.objects.filter(user=self.request.user)
-from datetime import datetime, timedelta
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from django.db.models import Sum
-from .models import Transaction  # Adjust this import based on your project structure
 
 class DailyIncomeTrendView(APIView):
     def get(self, request):
@@ -426,60 +421,77 @@ class AnalyticsView(APIView):
 
         return Response(analytics_data)
 
-def income_overview(request):
-    # Get the current month
-    today = datetime.now()
-    first_day_of_month = today.replace(day=1)
 
-    # Fetch income transactions for the current month
-    income_transactions = Transaction.objects.filter(
-        created_at__gte=first_day_of_month,
-        category_type='Income' 
-    ).values('category', 'amount')
+class IncomeOverviewView(APIView):
+    def get(self, request):
+        # Get the current date and the first day of the current month
+        today = now()
+        first_day_of_month = today.replace(day=1)
 
-    # Calculate the total income for percentage 
-    total_income = sum(item['amount'] for item in income_transactions)
+        # Fetch income transactions for the current month
+        income_transactions = (
+            Transaction.objects.filter(
+                created_at__gte=first_day_of_month,
+                category_type='Income',
+                user=request.user  # Filter by logged-in user
+            )
+            .values('category')
+            .annotate(amount=Sum('amount'))  # Sum amounts for each category
+        )
 
-    # Prepare the response data
-    income_data = []
-    for transaction in income_transactions:
-        percentage = (transaction['amount'] / total_income * 100) if total_income > 0 else 0
-        income_data.append({
-            'category': transaction['category'],
-            'amount': transaction['amount'],
-            'percentage': percentage
-        })
+        # Calculate the total income for the month
+        total_income = sum(item['amount'] for item in income_transactions)
 
-    # Return the data as JSON
-    return JsonResponse(income_data, safe=False)
+        # Prepare the response data with percentage calculation
+        income_data = []
+        for transaction in income_transactions:
+            percentage = round((transaction['amount'] / total_income * 100), 2) if total_income > 0 else 0
+            income_data.append({
+                'category': transaction['category'],
+                'amount': transaction['amount'],
+                'percentage': round(percentage,2)
+                            
+                })
+
+        # Return the data as a JSON response
+        return Response(income_data)
 
 
-def expense_overview(request):
-    # Get the current date and first day of the current month
-    today = datetime.now()
-    first_day_of_month = today.replace(day=1)
 
-    # Fetch expense transactions for the current month
-    expense_transactions = Transaction.objects.filter(
-        created_at__gte=first_day_of_month,
-        category_type='Expenses'  # Filter by category type "Expenses"
-    ).values('category', 'amount')
 
-    # Calculate the total expenses for percentage calculation
-    total_expense = sum(item['amount'] for item in expense_transactions)
+class ExpenseOverviewView(APIView):
+    def get(self, request):
+        # Get the current date and the first day of the current month
+        today = now()
+        first_day_of_month = datetime.now().replace(day=1)
 
-    # Prepare the response data
-    expense_data = []
-    for transaction in expense_transactions:  # Iterate over expense_transactions, not income_transactions
-        percentage = (transaction['amount'] / total_expense * 100) if total_expense > 0 else 0
-        expense_data.append({
-            'category': transaction['category'],
-            'amount': transaction['amount'],
-            'percentage': round(percentage, 2)  # Round percentage to 2 decimal places
-        })
+        # Fetch expense transactions for the current month
+        expense_transactions = (
+            Transaction.objects.filter(
+                created_at__gte=first_day_of_month,
+                category_type='Expenses',  # Filter by expense transactions
+                user=request.user  # Assuming you want to filter by the logged-in user
+            )
+            .values('category')
+            .annotate(total_amount=Sum('amount'))  # Group by category and sum the amounts
+        )
 
-    # Return the data as JSON
-    return JsonResponse(expense_data, safe=False)
+        # Calculate the total expenses for percentage calculation
+        total_expense = sum(item['total_amount'] for item in expense_transactions)
+
+        # Prepare the response data
+        expense_data = []
+        for transaction in expense_transactions:
+            percentage = (transaction['total_amount'] / total_expense * 100) if total_expense > 0 else 0
+            expense_data.append({
+                'category': transaction['category'],
+                'amount': transaction['total_amount'],
+                'percentage': round(percentage, 2)  # Round to two decimal places
+            })
+
+        # Return the data as a JSON response
+        return Response(expense_data)
+
 
 def income_transactions(request):
     # Fetch all transactions where category_type is 'Income'
@@ -524,3 +536,48 @@ def expense_transactions(request):
     # Return the data as JSON
     return JsonResponse(transactions_data, safe=False)
 
+
+
+class IncomeandExpenseProgressView(APIView):
+    def get(self, request):
+        # Fetch total income and income transaction count
+        income_data = Transaction.objects.filter(
+            user=request.user, category_type='Income'
+        ).aggregate(
+            total_income=Sum('amount'),
+            total_income_count=Count('id')
+        )
+
+        # Fetch total expenses
+        expense_data = Transaction.objects.filter(
+            user=request.user, category_type='Expenses'
+        ).aggregate(
+            total_expenses=Sum('amount'),
+            total_expenses_count=Count('id')
+        )
+
+        total_income = income_data['total_income'] or 0
+        total_income_count = income_data['total_income_count'] or 0
+        total_expenses = expense_data['total_expenses'] or 0
+        total_expenses_count = expense_data['total_expenses_count'] or 0
+
+        # Calculate income percentage based on total income per transaction
+        if total_income_count > 0:
+            average_income_per_transaction = total_income / total_income_count
+            income_percentage = (average_income_per_transaction / total_income) * 100
+        else:
+            income_percentage = 0
+
+        # Calculate expenses percentage based on total income
+        if total_expenses_count > 0:
+            average_expenses_per_transaction = total_expenses / total_expenses_count
+            expenses_percentage = (average_expenses_per_transaction / total_expenses) * 100
+        else:
+            expenses_percentage = 0
+       
+
+        # Return percentages as strings with '%' symbol
+        return Response({
+            "income_percentage": f"{round(income_percentage, 2)}%",
+            "expenses_percentage": f"{round(expenses_percentage, 2)}%"
+        })
