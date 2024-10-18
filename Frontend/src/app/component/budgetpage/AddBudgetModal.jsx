@@ -1,17 +1,40 @@
 import React, { useState } from 'react';
-import styles from '../../../styles/ExpenseModal.module.css'
+import styles from '../../../styles/ExpenseModal.module.css';
+import axios from '../../../api/axios';
+import { useSelector } from '../../../api/hook';
 
 const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
   const [name, setName] = useState('');
   const [amountSpent, setAmountSpent] = useState('');
-  const [totalAmount, setTotalAmount] = useState('')
+  const [totalAmount, setTotalAmount] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-
-  const handleSubmit = (e) => {
+  const accessToken = useSelector((state) => state.auth.accessToken);
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAddBudget({ name, amountSpent, totalAmount,startDate, endDate });
-    onClose();
+
+    const newBudget = {
+      name,
+      total_amount: totalAmount,
+      amount_spent: amountSpent,
+      start_date: startDate,
+      end_date: endDate,
+    };
+
+    try {
+      const response = await axios.post('/budgets/', newBudget
+        , {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+    
+      // Add the newly created budget to the list
+      onAddBudget(response.data);
+      onClose();
+    } catch (error) {
+      console.error('Error adding budget:', error);
+    }
   };
 
   if (!isOpen) return null;
@@ -34,51 +57,50 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
             />
           </div>
           <div className={styles.row}>
-          <div className={styles.formGroup}>
-            <label className={styles.label} >Total Amount</label>
-            <input
-              type="number"
-              id="totalAmount"
-              value={totalAmount}
-              onChange={(e) => setTotalAmount(e.target.value)}
-              placeholder="Enter total amount "
-              className={styles.input}
-            />
-          </div>
-          <div className={styles.formGroup}>
-            <label className={styles.label} htmlFor="amountSpent">Amount Spent</label>
-            <input
-              type="number"
-              id="amountSpent"
-              value={amountSpent}
-              onChange={(e) => setAmountSpent(e.target.value)}
-              placeholder="Enter amount spent"
-              className={styles.input}
-            />
-          </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Total Amount</label>
+              <input
+                type="number"
+                id="totalAmount"
+                value={totalAmount}
+                onChange={(e) => setTotalAmount(e.target.value)}
+                placeholder="Enter total amount"
+                className={styles.input}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="amountSpent">Amount Spent</label>
+              <input
+                type="number"
+                id="amountSpent"
+                value={amountSpent}
+                onChange={(e) => setAmountSpent(e.target.value)}
+                placeholder="Enter amount spent"
+                className={styles.input}
+              />
+            </div>
           </div>
           <div className={styles.row}>
-          <div className={styles.formGroup}>
-            <label className={styles.label} htmlFor="startDate">Start Date</label>
-            <input
-              type="date"
-              id="startDate"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className={styles.input}
-            />
-          </div>
-
-          <div className={styles.formGroup}>
-            <label className={styles.label} htmlFor="endDate">End Date</label>
-            <input
-              type="date"
-              id="endDate"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className={styles.input}
-            />
-          </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="startDate">Start Date</label>
+              <input
+                type="date"
+                id="startDate"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className={styles.input}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label} htmlFor="endDate">End Date</label>
+              <input
+                type="date"
+                id="endDate"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className={styles.input}
+              />
+            </div>
           </div>
           <button type="submit" className={styles.addButton}>Add Budget</button>
         </form>

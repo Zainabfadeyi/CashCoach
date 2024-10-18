@@ -17,7 +17,7 @@ import { useSelector } from "../../../api/hook";
 
 
 const TanStackTable = () => {
-  const { fetchTransactions } = useFetchTransactions();
+  const { AllTransactions } = useFetchTransactions();
   const [categoryColors, setCategoryColors] = useState({});
 
   const generateRandomColor = () => {
@@ -110,7 +110,7 @@ const [globalFilter, setGlobalFilter] = useState("");
 
   const getData = async () => {
     try {
-      const transactions = await fetchTransactions(); 
+      const transactions = await AllTransactions(); 
       setData(transactions); 
     } catch (error) {
       console.error("Failed to fetch transactions", error);

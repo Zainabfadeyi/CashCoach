@@ -30,13 +30,16 @@ router.register(r'categories', CategoryViewSet,basename='categories')
 router.register(r'budgets', BudgetViewSet,basename='budgets')
 router.register(r'incomes', IncomeViewSet,basename='incomes')
 router.register(r'expenses', ExpenseViewSet,basename='expenses')
+router.register(r'transactions', TransactionViewSet, basename='transaction')
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/', include((router.urls, "api"))), 
     path("api/user/details/", UserDetailsView.as_view({'get': 'list'}), name='user-details'),
+    # path("api/transactions/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
+    # path('api/transactions/<int:pk>/', TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
     path("api/transactions/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
-    path('api/transactions/<int:pk>/', TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
+    path("api/transactions/<int:pk>/", TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
     path('api/dashboard/total-income/<int:month>', TotalIncomeView.as_view(), name='total-income'),
     path('api/dashboard/total-expenses/<int:month>', TotalExpensesView.as_view(), name='total-expenses'),
     path('api/dashboard/daily-income-trend/', DailyIncomeTrendView.as_view(), name='daily-income-trend'),

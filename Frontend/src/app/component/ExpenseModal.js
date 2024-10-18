@@ -168,14 +168,14 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
   // };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const transactionType = category_type === 'Income' ? 'Income' : 'Expense';
+    const transactionType = category_type === 'Income' ? 'Income' : 'Expenses';
     
     const transactionData = { 
       amount, 
       transaction_date, 
       description, 
       category: category, 
-      transaction_type: transactionType 
+      category_type: transactionType 
     };
     
     try {

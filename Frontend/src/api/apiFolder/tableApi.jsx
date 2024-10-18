@@ -8,7 +8,7 @@ export const useFetchTransactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const apiUrl = `/transactions/?user_id=${userId}`;
+      const apiUrl = `dashboard/monthly-income-expense/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -22,6 +22,21 @@ export const useFetchTransactions = () => {
     }
   };
 
-  return { fetchTransactions };
+  const AllTransactions = async () => {
+    try {
+      const apiUrl = `transactions/?user_id=${userId}`;
+      const response = await axios.get(apiUrl, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      throw error;
+    }
+  };
+  return { fetchTransactions,AllTransactions };
 };
 

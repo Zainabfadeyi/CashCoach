@@ -12,7 +12,7 @@ const SidebarLink = styled(Link)`
   padding: 12px;
   list-style: none;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 18px;
   background: ${props => (props.isActive ? '#252831' : 'transparent')};
   border-left: ${props => (props.isActive ? '3px solid #632ce4' : 'none')};
   
@@ -56,9 +56,9 @@ const SubMenu = ({ item, activeLink, setActiveLink }) => {
         <div
           className={`${styles.sidebarItem} ${subnav ? styles.open : ''}`}
           onClick={showSubnav}
-          style={{ padding:"12px", fontSize: '15px', cursor: 'pointer', justifyContent: 'space-between', display:"flex" }}
+          style={{ padding:"20px 22px", fontSize: '15px', cursor: 'pointer', justifyContent: 'space-between', display:"flex"}}
         >
-          <div>
+          <div style={{display:"flex" , alignItems:"center"}}>
             {item.icon}
             <SidebarLabel>{item.title}</SidebarLabel>
           </div>
@@ -74,8 +74,9 @@ const SubMenu = ({ item, activeLink, setActiveLink }) => {
             setActiveLink(item.path);
             setActiveLink(item.title); // Set active link with the title
           }}
+          
         >
-          <div>
+          <div style={{display:"flex",marginLeft:"10px", alignItems:"center"}}>
             {item.icon}
             <SidebarLabel>{item.title}</SidebarLabel>
           </div>
@@ -91,8 +92,10 @@ const SubMenu = ({ item, activeLink, setActiveLink }) => {
             setActiveLink(subItem.title); // Set active link with sub-item title
           }}
         >
+          <div style={{display:"flex"}}>
           {subItem.icon}
           <SidebarLabel>{subItem.title}</SidebarLabel>
+          </div>
         </DropdownLink>
       ))}
     </>
