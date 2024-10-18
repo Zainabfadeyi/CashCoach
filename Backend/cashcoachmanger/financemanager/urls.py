@@ -54,7 +54,7 @@ urlpatterns = [
     path('api/budget/<int:pk>/progress/', BudgetProgressAPIView.as_view(), name='budget-progress'),
     path('api/budget/<str:name>/', BudgetDetailView.as_view(), name='budget-detail'),
     path('api/delete-budget/<int:budget_id>/', DeleteBudgetView.as_view(), name='delete-budget'),
-    path('api/sidebar/budgets/weekly-spending/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart'),
+    path('api/sidebar/budgets/<int:budget_id>/spending-chart/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart'),
 
     # ANALYTICS PAGE
     path('api/analytics/overview/', AnalyticsView.as_view(), name='analytics_overview'),

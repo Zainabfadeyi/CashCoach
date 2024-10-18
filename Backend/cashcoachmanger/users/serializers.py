@@ -15,6 +15,8 @@ class CustomUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email']
         
 class RegisterationSerializer(serializers.Serializer):
+    first_name = serializers.CharField()
+    last_name = serializers.CharField()
     username = serializers.CharField()
     email = serializers.EmailField()
     password1 = serializers.CharField(write_only=True, style={'input_type': 'password'})
@@ -30,7 +32,9 @@ class RegisterationSerializer(serializers.Serializer):
         return CustomUser.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
-            password=validated_data['password1']
+            password=validated_data['password1'],
+            first_name = validated_data['first_name'],
+            last_name = validated_data['last_name'],
         )
 
 User = get_user_model()
