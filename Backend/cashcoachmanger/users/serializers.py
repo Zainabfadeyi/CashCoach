@@ -56,3 +56,8 @@ class LoginSerializer(TokenObtainPairSerializer):
             raise ValidationError('Invalid email/password')
 
         return data
+
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email','password']

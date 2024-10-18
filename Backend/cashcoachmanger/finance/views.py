@@ -40,12 +40,12 @@ class IncomeByCategoryView(APIView):
         income_data = (
             Transaction.objects
             .filter(category_type='Income')  # Filter by income
-            .values('category__name')  # Group by category name
+            .values('category')  # Group by category name
             .distinct()  # Get unique category names
         )
 
         # Prepare the response
-        categories = [item['category__name'] for item in income_data]
+        categories = [item['category'] for item in income_data]
 
         return Response(categories, status=200)
     
@@ -54,13 +54,13 @@ class ExpenseByCategoryView(APIView):
         # Fetch expense transactions grouped by category
         expense_data = (
             Transaction.objects
-            .filter(category_type='Expense')  # Filter by expenses
-            .values('category__name')  # Group by category name
+            .filter(category_type='Expenses')  # Filter by expenses
+            .values('category')  # Group by category name
             .distinct()  # Get unique category names
         )
 
         # Prepare the response
-        categories = [item['category__name'] for item in expense_data]
+        categories = [item['category'] for item in expense_data]
 
         return Response(categories, status=200)
      
@@ -247,32 +247,32 @@ class BudgetDashboardView(generics.ListAPIView):
     serializer_class = BudgetDashboardSerializer
     
 
-
 class WeeklySpendingChartView(generics.GenericAPIView):
     serializer_class = BudgetWeeklySpendingSerializer
 
     def get(self, request, *args, **kwargs):
         today = datetime.now().date()
-         # Get data for the last 30 days
-        start_date = today - timedelta(days=30) 
+        # Get data for the last 30 days
+        start_date = today - timedelta(days=30)
 
-        #  a list of weekly intervals
+        # A list of weekly intervals
         weeks = []
         for i in range(5):  # 5 weeks
             week_start = start_date + timedelta(days=i * 7)
             week_end = week_start + timedelta(days=7)
             total_spent = Transaction.objects.filter(
-                date__gte=week_start,
-                date__lt=week_end,
+                transaction_date__gte=week_start,
+                transaction_date__lt=week_end,
                 category_type='Expenses'
             ).aggregate(total=Sum('amount'))['total'] or 0
+            
             weeks.append({
                 'week_start': week_start,
                 'amount_spent': total_spent
             })
 
         return Response(weeks)
-
+    
 class MonthlyIncomeExpenseView(APIView):
 
     def get(self, request, *args, **kwargs):
@@ -286,7 +286,9 @@ class MonthlyIncomeExpenseView(APIView):
         for i in range(0, 12):
             # Calculate the first and last day of each month
             first_day_of_month = (start_month - timedelta(days=30 * i)).replace(day=1)
-            last_day_of_month = first_day_of_month.replace(day=calendar.monthrange(first_day_of_month.year, first_day_of_month.month)[1])
+            last_day_of_month = first_day_of_month.replace(
+                day=calendar.monthrange(first_day_of_month.year, first_day_of_month.month)[1]
+            )
 
             # Query total income for this month
             monthly_income = Transaction.objects.filter(
@@ -300,8 +302,8 @@ class MonthlyIncomeExpenseView(APIView):
                 transaction_date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
 
-            # Format the month name (e.g., "Oct 2024")
-            month_name = first_day_of_month.strftime('%b %Y')
+            # Format the month name (e.g., "Oct")
+            month_name = first_day_of_month.strftime('%b')
 
             # Add data to the monthly_data dictionary with the month as a key
             monthly_data[month_name] = {
@@ -310,6 +312,7 @@ class MonthlyIncomeExpenseView(APIView):
             }
 
         return Response(monthly_data)
+    
 class TransactionViewSet(CustomViewSet):
     lookup_field = 'pk' 
     permission_classes = [IsAuthenticated]
@@ -329,8 +332,6 @@ class TransactionViewSet(CustomViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        # print("Received data:", request.data)  # Debugging line
-       
         user_id = request.query_params.get('user_id')
         if not user_id:
             return Response({"error": "User ID is required."}, status=400)
@@ -339,17 +340,8 @@ class TransactionViewSet(CustomViewSet):
         if serializer.is_valid():
             transaction = serializer.save(user_id=user_id)
             return Response(serializer.data, status=201)
-        # return Response(serializer.errors, status=400)
-        transaction = self.get_object()
+        return Response(serializer.errors, status=400)
 
-        # Try to update the matching budget (this is handled by the signal)
-        try:
-            budget = Budget.objects.get(name=transaction.category)
-            serializer = BudgetSerializer(budget)
-            return Response(serializer.data, status=200)
-        except Budget.DoesNotExist:
-            return Response({"detail": "Budget not found"}, status=400)
-   
     def delete(self, request, *args, **kwargs):
         
         pk = kwargs.get('pk')  # Get the pk from URL
@@ -364,7 +356,8 @@ class TransactionViewSet(CustomViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data,status=201)
- 
+    
+
 class AnalyticsView(APIView):
     
     def get(self, request, *args, **kwargs):
@@ -431,11 +424,57 @@ def income_overview(request):
     return JsonResponse(income_data, safe=False)
 
 
+def expense_overview(request):
+    # Get the current date and first day of the current month
+    today = datetime.now()
+    first_day_of_month = today.replace(day=1)
 
+    # Fetch expense transactions for the current month
+    expense_transactions = Transaction.objects.filter(
+        created_at__gte=first_day_of_month,
+        category_type='Expenses'  # Filter by category type "Expenses"
+    ).values('category', 'amount')
+
+    # Calculate the total expenses for percentage calculation
+    total_expense = sum(item['amount'] for item in expense_transactions)
+
+    # Prepare the response data
+    expense_data = []
+    for transaction in expense_transactions:  # Iterate over expense_transactions, not income_transactions
+        percentage = (transaction['amount'] / total_expense * 100) if total_expense > 0 else 0
+        expense_data.append({
+            'category': transaction['category'],
+            'amount': transaction['amount'],
+            'percentage': round(percentage, 2)  # Round percentage to 2 decimal places
+        })
+
+    # Return the data as JSON
+    return JsonResponse(expense_data, safe=False)
 
 def income_transactions(request):
     # Fetch all transactions where category_type is 'Income'
     transactions = Transaction.objects.filter(category_type='Income')
+
+    # Prepare the response data
+    transactions_data = [
+        {
+            'id': transaction.id,  
+            'category': transaction.category,
+            'amount': transaction.amount,
+            'category_type': transaction.category_type,
+            'transaction_date':transaction.transaction_date,
+            'created_at': transaction.created_at, 
+        }
+        for transaction in transactions
+    ]
+
+    # Return the data as JSON
+    return JsonResponse(transactions_data, safe=False)
+
+
+def expense_transactions(request):
+    # Fetch all transactions where category_type is 'Income'
+    transactions = Transaction.objects.filter(category_type='Expenses')
 
     # Prepare the response data
     transactions_data = [

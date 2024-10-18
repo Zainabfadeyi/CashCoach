@@ -1,5 +1,5 @@
 from rest_framework import viewsets,status,generics
-from .serializers import RegisterationSerializer,LoginSerializer
+from .serializers import RegisterationSerializer,LoginSerializer,ProfileUpdateSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
@@ -58,3 +58,12 @@ class UserDetailsView(viewsets.ViewSet):
         serializer = CustomUserSerializer(user)  # Serialize user data
         return Response(serializer.data, status=status.HTTP_200_OK)  # Return user details
 
+class ProfileUpdateViewSet(viewsets.ModelViewSet):
+    serializer_class = ProfileUpdateSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        return self.request.user  # Get the authenticated user
+
+    def perform_update(self, serializer):
+        serializer.save()  # Save the updated user data
