@@ -54,8 +54,19 @@ const ProfilePictureUpload = () => {
       <div style={{marginBottom:"30px", marginTop:"30px"}}> 
       <input type="file" accept="image/*" onChange={handleImageChange} />
       </div>
-      <div  style={{ padding:"15px"}}>
-        <button style={{backgroundColor:"blue",padding:"15px",border:"none",color:"white"}} type="submit">Save</button>
+      <div>
+        <button style={{backgroundColor:"blue",
+        padding:"15px",
+        border:"none",
+        color:"white",
+        display:"flex",
+        justifyContent:"center",
+        paddingLeft:"40px",
+        paddingRight:"40px",
+        borderRadius:"5px"
+        }} type="submit">
+            Save
+            </button>
         </div>
       </form>
 
