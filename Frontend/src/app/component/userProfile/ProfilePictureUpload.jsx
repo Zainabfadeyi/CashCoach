@@ -54,12 +54,11 @@ const ProfilePictureUpload = () => {
       <div style={{marginBottom:"30px", marginTop:"30px"}}> 
       <input type="file" accept="image/*" onChange={handleImageChange} />
       </div>
-      <div  style={{backgroundColor:"blue", padding:"15px"}}>
-        <button style={{backgroundColor:"none",background:"none",border:"none",color:"white"}} type="submit">Save</button>
+      <div  style={{ padding:"15px"}}>
+        <button style={{backgroundColor:"blue",padding:"15px",border:"none",color:"white"}} type="submit">Save</button>
         </div>
       </form>
 
-      {/* Preview the selected image */}
       {imagePreviewUrl && (
         <div>
           <h3>Preview:</h3>
