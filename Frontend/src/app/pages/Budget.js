@@ -197,11 +197,16 @@ import { CiSquarePlus } from 'react-icons/ci';
 import AddBudgetModal from '../component/budgetpage/AddBudgetModal';
 import { useSelector } from '../../api/hook';
 import { format, differenceInDays } from 'date-fns';
+import LoadingSpinner from '../component/LoadingSpinner';
+import { MdDeleteOutline } from 'react-icons/md';
+import DeleteMemo from '../component/tables/DeleteMemo';
 
 const Budget = () => {
   const [budgets, setBudgets] = useState([]);
   const [selectedBudget, setSelectedBudget] = useState(null);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);  // State for delete modal
+  const [budgetToDelete, setBudgetToDelete] = useState(null);      
   const accessToken = useSelector((state) => state.auth.accessToken);
 
   // Fetch all budgets when component mounts
@@ -249,9 +254,26 @@ const Budget = () => {
       console.error('Error fetching budget progress:', error);
     }
   };
+  const handleDeleteBudget = async () => {
+    try {
+      await axios.delete(`/delete-budget/${budgetToDelete.id}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      // Update the list by removing the deleted budget
+      setBudgets(budgets.filter((budget) => budget.id !== budgetToDelete.id));
+      setDeleteModalOpen(false); // Close the modal
+      setBudgetToDelete(null); // Reset budget to delete
+    } catch (error) {
+      console.error('Error deleting budget:', error);
+    }
+  };
 
   if (!selectedBudget) {
-    return <div>Loading...</div>;
+    return <div>
+      <LoadingSpinner  size={50} message="Processing..."/>
+    </div>;
   }
 
   const getTimeLabel = (startDate, endDate) => {
@@ -328,7 +350,19 @@ const Budget = () => {
       <div style={{ width: '70%' }}>
         {selectedBudget ? (
           <>
-            <div className={styles.header}>{selectedBudget.name}</div>
+          <div className={styles.header} >
+            <div className={styles.name}>{selectedBudget.name}</div>
+            <div
+                onClick={() => {
+                  setBudgetToDelete(selectedBudget); // Set the selected budget to delete
+                  setDeleteModalOpen(true); // Open the delete modal
+                }}
+                style={{ cursor: 'pointer' }}
+                className={styles.name}
+              >
+                <MdDeleteOutline  />
+              </div>
+            </div>
             <div className={styles.BudgetSecond}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
                 <div style={{ fontSize: '17px', color: '#1F2C73' }}>Spend</div>
@@ -378,6 +412,12 @@ const Budget = () => {
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onAddBudget={handleAddBudget}
+      />
+         <DeleteMemo
+        isOpen={isDeleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDeleteBudget}
+        transactionId={budgetToDelete?.name}
       />
     </div>
   );

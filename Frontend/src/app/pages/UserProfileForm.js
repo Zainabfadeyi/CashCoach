@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styles from '../../styles/userProfile.module.css';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import ProfilePictureUpload from '../component/userProfile/ProfilePictureUpload';
 // import { userFormService } from '../api/userFormService';
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
@@ -176,6 +177,10 @@ const UserProfileForm = () => {
 
     return (
         <div>
+            <div>
+                <ProfilePictureUpload/>
+            </div>
+        <div>
             <h2>User Profile</h2>
             <label>
                 First Name:
@@ -249,6 +254,7 @@ const UserProfileForm = () => {
                     <button >Yes, Delete</button>
                 </div>
             )}
+        </div>
         </div>
     );
 };

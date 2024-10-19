@@ -13,13 +13,20 @@ import styles from "../../../styles/table.module.css";
 import ActionsDropdown from "./ActionDropdown";
 import { useFetchTransactions } from "../../../api/apiFolder/tableApi";
 import { useSelector } from "../../../api/hook";
+import EditTableModal from "../tables/EditTableModal";
+import axios from "../../../api/axios";
+import DeleteMemo from "../tables/DeleteMemo";
 
 
 
 const TanStackTable = () => {
   const { AllTransactions } = useFetchTransactions();
   const [categoryColors, setCategoryColors] = useState({});
-
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTrasactionToDelete] = useState(null);
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const generateRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -41,7 +48,7 @@ const TanStackTable = () => {
     return categoryColors[category];
   };
   const columnHelper = createColumnHelper();
-  const userId = useSelector((state) => state.auth.user?.id);
+
 const columns = [
   columnHelper.accessor("transaction_date", {
     header: "Date",
@@ -60,22 +67,7 @@ const columns = [
       return <span>₦{isNaN(amount) ? '0.00' : amount.toFixed(2)}</span>; // Default to '0.00' if NaN
     },
   }),
-  // columnHelper.accessor("category", {
-  //   header: "Category",
-  //   cell: (info) => {
-  //     const category = info.getValue();
-  //     return (
-  //       <span
-  //         className={styles.categoryCell}
-  //         style={{
-  //           backgroundColor: categoryColors[category] || '#ccc', 
-  //         }}
-  //       >
-  //         {category}
-  //       </span>
-  //     );
-  //   },
-  // }),
+  
   columnHelper.accessor("category", {
     header: "Category",
     cell: (info) => {
@@ -97,9 +89,12 @@ const columns = [
     header: "Actions",
     cell: (info) => (
       <ActionsDropdown
-        onView={() => handleView(info.row.original)}
-        onDelete={() => handleDelete(info.row.original)}
-      />
+  onView={() => {
+    console.log("View action triggered"); // Add this log
+    handleView(info.row.original);
+  }}
+  onDelete={() => handleDeleteClick(info.row.original)}
+/>
     ),
   }),
 ];
@@ -132,13 +127,52 @@ const table = useReactTable({
 });
 
 
-
 const handleView = (transaction) => {
-  console.log('View transaction:', transaction);
+  console.log("Selected Transaction for Deletion:", transaction);
+  setSelectedTransaction(transaction); // Set the selected transaction
+  setEditModalOpen(true); // Open the edit modal
 };
 
-const handleDelete = (transactionId) => {
-  setData(prevData => prevData.filter(transaction => transaction.transactionId !== transactionId));
+
+const handleCloseEditModal = () => {
+  setEditModalOpen(false); // Close the modal
+  setSelectedTransaction(null); // Reset selected transaction
+};
+
+const handleUpdateTransaction = (updatedTransaction) => {
+  setData((prevData) =>
+    prevData.map((transaction) =>
+      transaction.id === updatedTransaction.id ? updatedTransaction : transaction
+    )
+  );
+  handleCloseEditModal(); // Close the modal after updating
+};
+
+const handleDeleteClick = (transaction) => {
+  console.log("Selected Transaction for Deletion:", transaction);
+  setTrasactionToDelete(transaction); // Set the memo to delete
+  setIsDeleteDialogOpen(true); // Open the delete dialog
+};
+const handleDeleteConfirm =async (transactionId) => {
+  try {
+    const response = await axios.delete(`/transactions/${transactionId}/`, 
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}` 
+        }
+  });
+  if (response.data) {
+    console.log("Memo deleted successfully.");
+    getData(); // Fetch the data again after deletion
+  } else {
+    console.error("Failed to delete memo.");
+  }
+} catch (error) {
+  console.error("Error deleting memo:", error);
+} finally {
+  setIsDeleteDialogOpen(false);
+
+}
 };
 return (
   <div style={{width:"100%"}}>
@@ -243,6 +277,22 @@ return (
         ))}
       </select>
     </div>
+    {isEditModalOpen && (
+        <EditTableModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          transaction={selectedTransaction} // Pass the selected transaction
+          onUpdate={handleUpdateTransaction} // Callback for updating transaction
+        />
+      )}
+       {isDeleteDialogOpen && (
+        <DeleteMemo
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          transactionId={transactionToDelete?.category}
+          onConfirm={() => handleDeleteConfirm(transactionToDelete.id)}
+        />
+      )}
   </div>
 );
 };

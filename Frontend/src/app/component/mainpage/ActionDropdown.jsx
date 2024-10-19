@@ -33,7 +33,7 @@ const ActionsDropdown = ({ onView, onDelete }) => {
       </div>
       {dropdownOpen && (
         <div className={styles.dropdownMenu}>
-          <div className={styles.dropdownItem} onClick={onView}>View</div>
+          <div className={styles.dropdownItem} onClick={onView}>Edit</div>
           <div className={styles.dropdownItem} onClick={onDelete}>Delete</div>
         </div>
       )}

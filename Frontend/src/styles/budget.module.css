@@ -14,14 +14,23 @@
 .header{
     background-color: #fff;
    box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
-    padding: 15px;
-    font-size: 25px;
-    color: #1F2C73;
-    font-weight: 700;
-    margin-bottom: 30px;
+   margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     border-radius: 10px;
+    color: #1F2C73;
 
 }
+.name{
+
+     padding: 15px;
+     font-size: 25px;
+     font-weight: 700;
+}
+
+
 .update{
     display: flex;
     width: 100%;

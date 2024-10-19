@@ -14,12 +14,20 @@ import { TRANSACTIONS } from "../../data"; // Adjust the import based on your fi
 import ActionsDropdown from "../../component/mainpage/ActionDropdown";
 import { useFetchTransactions } from "../../../api/apiFolder/tableApi";
 import DownloadBtn from './DownloadBtn'
+import EditTableModal from "./EditTableModal";
+import axios from "../../../api/axios";
+import DeleteMemo from "./DeleteMemo";
+import { useSelector } from "../../../api/hook";
 
 
 const TanStackTable = () => {
   const { fetchTransactions } = useFetchTransactions();
   const [categoryColors, setCategoryColors] = useState({});
-
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTrasactionToDelete] = useState(null);
+  const accessToken = useSelector((state) => state.auth.accessToken);
   const generateRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -82,9 +90,12 @@ const columns = [
     header: "Actions",
     cell: (info) => (
       <ActionsDropdown
-        onView={() => handleView(info.row.original)}
-        onDelete={() => handleDelete(info.row.original)}
-      />
+  onView={() => {
+    console.log("View action triggered"); // Add this log
+    handleView(info.row.original);
+  }}
+  onDelete={() => handleDeleteClick(info.row.original)}
+/>
     ),
   }),
 ];
@@ -117,13 +128,52 @@ const table = useReactTable({
 });
 
 
-
 const handleView = (transaction) => {
-  console.log('View transaction:', transaction);
+  console.log("Selected Transaction for Deletion:", transaction);
+  setSelectedTransaction(transaction); // Set the selected transaction
+  setEditModalOpen(true); // Open the edit modal
 };
 
-const handleDelete = (transactionId) => {
-  setData(prevData => prevData.filter(transaction => transaction.transactionId !== transactionId));
+
+const handleCloseEditModal = () => {
+  setEditModalOpen(false); // Close the modal
+  setSelectedTransaction(null); // Reset selected transaction
+};
+
+const handleUpdateTransaction = (updatedTransaction) => {
+  setData((prevData) =>
+    prevData.map((transaction) =>
+      transaction.id === updatedTransaction.id ? updatedTransaction : transaction
+    )
+  );
+  handleCloseEditModal(); // Close the modal after updating
+};
+
+const handleDeleteClick = (transaction) => {
+  console.log("Selected Transaction for Deletion:", transaction);
+  setTrasactionToDelete(transaction); // Set the memo to delete
+  setIsDeleteDialogOpen(true); // Open the delete dialog
+};
+const handleDeleteConfirm =async (transactionId) => {
+  try {
+    const response = await axios.delete(`/transactions/${transactionId}/`, 
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}` 
+        }
+  });
+  if (response.data) {
+    console.log("Memo deleted successfully.");
+    getData(); // Fetch the data again after deletion
+  } else {
+    console.error("Failed to delete memo.");
+  }
+} catch (error) {
+  console.error("Error deleting memo:", error);
+} finally {
+  setIsDeleteDialogOpen(false);
+
+}
 };
 return (
   <div style={{width:"100%"}}>
@@ -136,7 +186,7 @@ return (
             onChange={(value) => setGlobalFilter(String(value))}
           />
         </div>
-        <DownloadBtn data={data} fileName={"All Requests"} />
+        <DownloadBtn data={data} fileName={"All Income"} />
       </div>
       <div className={styles.wrapper}>
         <table className={styles.table}>
@@ -229,6 +279,22 @@ return (
         ))}
       </select>
     </div>
+    {isEditModalOpen && (
+        <EditTableModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          transaction={selectedTransaction} // Pass the selected transaction
+          onUpdate={handleUpdateTransaction} // Callback for updating transaction
+        />
+      )}
+       {isDeleteDialogOpen && (
+        <DeleteMemo
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          transactionId={transactionToDelete?.category}
+          onConfirm={() => handleDeleteConfirm(transactionToDelete.id)}
+        />
+      )}
   </div>
 );
 };
