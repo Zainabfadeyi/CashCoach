@@ -58,12 +58,21 @@ class BudgetDetailSerializer(serializers.ModelSerializer):
         fields = ['name', 'total_amount', 'amount_spent', 'percentage_spent']
 
 class BudgetDashboardSerializer(serializers.ModelSerializer):
-    percentage_spent = serializers.ReadOnlyField()
-
+    # Define percentage_spent as a method field
+    percentage_spent = serializers.SerializerMethodField()
 
     class Meta:
         model = Budget
         fields = ['name', 'percentage_spent']
+
+    def get_percentage_spent(self, obj):
+        # Get the sum of all 'amount_spent' across all budgets
+        total_amount_spent = Budget.objects.aggregate(total_spent=Sum('amount_spent'))['total_spent']
+        
+        if total_amount_spent and total_amount_spent > 0:  # Avoid division by zero
+            return round((obj.amount_spent / total_amount_spent) * 100, 2)
+        return 0.0  # If the total amount spent is zero, return 0%
+
 
 class BudgetListSerializer(serializers.ModelSerializer):
     class Meta:

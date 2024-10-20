@@ -8,6 +8,9 @@ import { TbTransformPointTopRight } from 'react-icons/tb';
 import { CiExport } from 'react-icons/ci';
 import { useSelector } from '../../api/hook';
 import TanStackTable from '../component/mainpage/TanStackTable';
+import LoadingSpinner from '../component/LoadingSpinner';
+import { useFetchTransactions } from '../../api/apiFolder/tableApi';
+import DownloadIncxExp from '../component/tables/DownloadIncxExp';
 
 const IncvsExp = () => {
   const [overviewData, setOverviewData] = useState({
@@ -15,9 +18,25 @@ const IncvsExp = () => {
     total_categories: 0,
     total_transactions: 0,
   });
+  const { AllTransactions } = useFetchTransactions();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const [data, setData] = useState([]);
+
+
+
+  const getData = async () => {
+    try {
+      const transactions = await AllTransactions(); 
+      setData(transactions); 
+    } catch (error) {
+      console.error("Failed to fetch transactions", error);
+    }
+  };
+  useEffect(() => {
+  getData();
+}, []);
   // Fetch the API data
   useEffect(() => {
     const fetchOverviewData = async () => {
@@ -40,12 +59,13 @@ const IncvsExp = () => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div> <LoadingSpinner message="Loading expenses data..." /></div>;
   }
 
   if (error) {
     return <div>Error fetching data: {error.message}</div>;
   }
+
 
   return (
     <div>
@@ -95,7 +115,7 @@ const IncvsExp = () => {
         <div className={styles.second}>
           <div className={styles.section}>
             <div className={styles.plus}>
-              <CiExport />
+            <DownloadIncxExp data={data} fileName={"All Transactions"} />
             </div>
             <div style={{ fontWeight: '700' }}>Export Data</div>
           </div>

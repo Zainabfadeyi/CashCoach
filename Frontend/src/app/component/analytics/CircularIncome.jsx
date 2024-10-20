@@ -1,8 +1,10 @@
 
   import React, { useEffect, useState } from 'react';
-  import axios from 'axios'; // Import axios for API requests
+  import axios from '../../../api/axios';
   import 'bootstrap/dist/css/bootstrap.min.css';
   import styles from '../../../styles/expenses.module.css';
+import { useSelector } from '../../../api/hook';
+import LoadingSpinner from '../LoadingSpinner';
   
   const CircularIncome = ({ incomePercentage, expensePercentage }) => {
     return (
@@ -52,13 +54,20 @@
     const [transactions, setTransactions] = useState([]);
     const [totalIncome, setTotalIncome] = useState(5000); // Example total income value
     const [isLoading, setIsLoading] = useState(true); // Track loading state
-  
+    const accessToken = useSelector((state) => state.auth.accessToken);
     // Fetch data from the API
     useEffect(() => {
       const fetchTransactions = async () => {
         try {
           setIsLoading(true);
-          const response = await axios.get('http://127.0.0.1:8000/income/overview/');
+          const response = await axios.get('income-overview/',
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+      
+            });
+        
           const data = response.data;
           setTransactions(data);
           setIsLoading(false);
@@ -72,7 +81,7 @@
     }, []);
   
     if (isLoading) {
-      return <div>Loading...</div>;
+      return <div><LoadingSpinner  size={50} message="Processing..."/></div>;
     }
   
     // Calculate expense percentages (adjusted from API data)

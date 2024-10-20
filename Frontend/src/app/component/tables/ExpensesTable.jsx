@@ -15,116 +15,167 @@ import {
 import { useFetchTransactions } from "../../../api/apiFolder/tableApi";
 import DownloadBtn from './DownloadBtn'
 
-  
-  const ExpensesTable = () => {
-    const { fetchExpTransactions } = useFetchTransactions();
-    const [categoryColors, setCategoryColors] = useState({});
-  
-    const generateRandomColor = () => {
-      const letters = "0123456789ABCDEF";
-      let color = "#";
-      for (let i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color;
-    };
-  
-    const getColorForCategory = (category) => {
-      if (!categoryColors[category]) {
-        const newColor = generateRandomColor();
-        setCategoryColors((prevColors) => ({
-          ...prevColors,
-          [category]: newColor,
-        }));
-        return newColor;
-      }
-      return categoryColors[category];
-    };
-    const columnHelper = createColumnHelper();
+import EditTableModal from "./EditTableModal";
+import axios from "../../../api/axios";
+import DeleteMemo from "./DeleteMemo";
+import { useSelector } from "../../../api/hook";
 
-  const columns = [
-    columnHelper.accessor("transaction_date", {
-      header: "Date",
-      cell: (info) => <span>{info.getValue()}</span>,
-    }),
-    
-    columnHelper.accessor("description", {
-      header: "Description",
-      cell: (info) => <span>{info.getValue()}</span>,
-    }),
-    columnHelper.accessor("amount", {
-      header: "Amount",
-      cell: (info) => {
-        const value = info.getValue();
-        const amount = parseFloat(value);
-        return <span>₦{isNaN(amount) ? '0.00' : amount.toFixed(2)}</span>; // Default to '0.00' if NaN
-      },
-    }),
-    
-    columnHelper.accessor("category", {
-      header: "Category",
-      cell: (info) => {
-        const category = info.getValue();
-        const color = getColorForCategory(category);
-        return (
-          <span
-            className={styles.categoryCell}
-            style={{
-              backgroundColor: color,
-            }}
-          >
-            {category}
-          </span>
-        );
-      },
-    }),
-    columnHelper.accessor("actions", {
-      header: "Actions",
-      cell: (info) => (
-        <ActionsDropdown
-          onView={() => handleView(info.row.original)}
-          onDelete={() => handleDelete(info.row.original)}
-        />
-      ),
-    }),
-  ];
+
+const ExpensesTable = () => {
+  const { fetchExpTransactions } = useFetchTransactions();
+  const [categoryColors, setCategoryColors] = useState({});
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [transactionToDelete, setTrasactionToDelete] = useState(null);
+  const accessToken = useSelector((state) => state.auth.accessToken);
+  const generateRandomColor = () => {
+    const letters = "0123456789ABCDEF";
+    let color = "#";
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  };
+
+  const getColorForCategory = (category) => {
+    if (!categoryColors[category]) {
+      const newColor = generateRandomColor();
+      setCategoryColors((prevColors) => ({
+        ...prevColors,
+        [category]: newColor,
+      }));
+      return newColor;
+    }
+    return categoryColors[category];
+  };
+  const columnHelper = createColumnHelper();
+
+const columns = [
+  columnHelper.accessor("transaction_date", {
+    header: "Date",
+    cell: (info) => <span>{info.getValue()}</span>,
+  }),
   
-  const [data, setData] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState("");
-  
-  
-    const getData = async () => {
-      try {
-        const transactions = await fetchExpTransactions(); 
-        setData(transactions); 
-      } catch (error) {
-        console.error("Failed to fetch transactions", error);
-      }
-    };
-    useEffect(() => {
-    getData();
-  }, []);
-  
-  const table = useReactTable({
-    data,
-    columns,
-    state: {
-      globalFilter,
+  columnHelper.accessor("description", {
+    header: "Description",
+    cell: (info) => <span>{info.getValue()}</span>,
+  }),
+  columnHelper.accessor("amount", {
+    header: "Amount",
+    cell: (info) => {
+      const value = info.getValue();
+      const amount = parseFloat(value);
+      return <span>₦{isNaN(amount) ? '0.00' : amount.toFixed(2)}</span>; // Default to '0.00' if NaN
     },
-    getFilteredRowModel: getFilteredRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+  }),
+  
+  columnHelper.accessor("category", {
+    header: "Category",
+    cell: (info) => {
+      const category = info.getValue();
+      const color = getColorForCategory(category);
+      return (
+        <span
+          className={styles.categoryCell}
+          style={{
+            backgroundColor: color,
+          }}
+        >
+          {category}
+        </span>
+      );
+    },
+  }),
+  columnHelper.accessor("actions", {
+    header: "Actions",
+    cell: (info) => (
+      <ActionsDropdown
+  onView={() => {
+    console.log("View action triggered"); // Add this log
+    handleView(info.row.original);
+  }}
+  onDelete={() => handleDeleteClick(info.row.original)}
+/>
+    ),
+  }),
+];
+
+const [data, setData] = useState([]);
+const [globalFilter, setGlobalFilter] = useState("");
+
+
+  const getData = async () => {
+    try {
+      const transactions = await fetchExpTransactions(); 
+      setData(transactions); 
+    } catch (error) {
+      console.error("Failed to fetch transactions", error);
+    }
+  };
+  useEffect(() => {
+  getData();
+}, []);
+
+const table = useReactTable({
+  data,
+  columns,
+  state: {
+    globalFilter,
+  },
+  getFilteredRowModel: getFilteredRowModel(),
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+});
+
+
+const handleView = (transaction) => {
+  console.log("Selected Transaction for Deletion:", transaction);
+  setSelectedTransaction(transaction); // Set the selected transaction
+  setEditModalOpen(true); // Open the edit modal
+};
+
+
+const handleCloseEditModal = () => {
+  setEditModalOpen(false); // Close the modal
+  setSelectedTransaction(null); // Reset selected transaction
+};
+
+const handleUpdateTransaction = (updatedTransaction) => {
+  setData((prevData) =>
+    prevData.map((transaction) =>
+      transaction.id === updatedTransaction.id ? updatedTransaction : transaction
+    )
+  );
+  handleCloseEditModal(); // Close the modal after updating
+};
+
+const handleDeleteClick = (transaction) => {
+  console.log("Selected Transaction for Deletion:", transaction);
+  setTrasactionToDelete(transaction); // Set the memo to delete
+  setIsDeleteDialogOpen(true); // Open the delete dialog
+};
+const handleDeleteConfirm =async (transactionId) => {
+  try {
+    const response = await axios.delete(`/transactions/${transactionId}/`, 
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}` 
+        }
   });
-  
-  
-  
-  const handleView = (transaction) => {
-    console.log('View transaction:', transaction);
-  };
-  
-  const handleDelete = (transactionId) => {
-    setData(prevData => prevData.filter(transaction => transaction.transactionId !== transactionId));
-  };
+  if (response.data) {
+    console.log("Memo deleted successfully.");
+    getData(); // Fetch the data again after deletion
+  } else {
+    console.error("Failed to delete memo.");
+  }
+} catch (error) {
+  console.error("Error deleting memo:", error);
+} finally {
+  setIsDeleteDialogOpen(false);
+
+}
+};
   return (
     <div style={{width:"100%"}}>
       <div className={styles.tableContainer}>
@@ -136,7 +187,7 @@ import DownloadBtn from './DownloadBtn'
               onChange={(value) => setGlobalFilter(String(value))}
             />
           </div>
-          <DownloadBtn data={data} fileName={"All Requests"} />
+          <DownloadBtn data={data} fileName={"All Expenses"} />
         </div>
         <div className={styles.wrapper}>
           <table className={styles.table}>
@@ -229,6 +280,22 @@ import DownloadBtn from './DownloadBtn'
           ))}
         </select>
       </div>
+      {isEditModalOpen && (
+        <EditTableModal
+          isOpen={isEditModalOpen}
+          onClose={handleCloseEditModal}
+          transaction={selectedTransaction} // Pass the selected transaction
+          onUpdate={handleUpdateTransaction} // Callback for updating transaction
+        />
+      )}
+       {isDeleteDialogOpen && (
+        <DeleteMemo
+          isOpen={isDeleteDialogOpen}
+          onClose={() => setIsDeleteDialogOpen(false)}
+          transactionId={transactionToDelete?.category}
+          onConfirm={() => handleDeleteConfirm(transactionToDelete.id)}
+        />
+      )}
     </div>
   );
   };

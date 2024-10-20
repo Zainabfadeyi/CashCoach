@@ -86,9 +86,7 @@ const Dashboard = () => {
 
   const handleAddExpense = async (expenseData) => {
     try {
-      const newTransaction = await addTransaction(expenseData);
-      console.log('Transaction added:', newTransaction);
-      // Optionally, refresh transactions or update local state here
+      
     } catch (error) {
       console.error('Failed to add transaction:', error);
     }

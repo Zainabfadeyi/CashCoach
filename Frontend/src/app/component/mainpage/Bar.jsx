@@ -12,12 +12,12 @@ const transformDataForBarChart = (data) => {
 };
 
 const Bar = () => {
-  const { fetchTransactions } = useFetchTransactions();
+  const { analyticsTransactions } = useFetchTransactions();
   const [barChartData, setBarChartData] = useState([]);
 
   const fetchData = async () => {
     try {
-      const data = await fetchTransactions();
+      const data = await analyticsTransactions();
       const transformedData = transformDataForBarChart(data);
       setBarChartData(transformedData);
     } catch (error) {

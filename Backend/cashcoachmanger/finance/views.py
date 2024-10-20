@@ -109,46 +109,44 @@ class IncomeViewSet(CustomViewSet):
 class DailyIncomeTrendView(APIView):
     def get(self, request):
         today = datetime.now().date()
-        start_date = today - timedelta(days=11) 
-         # Get the date 11 days before today (12 days total)
+        start_date = today - timedelta(days=11)  # 12 days total
 
-        # Fetch income transactions for the last 12 days of the month, grouped by transaction_date
+        # Fetch income transactions for the last 12 days, grouped by transaction_date
         income_data = (
             Transaction.objects
-            .filter(category_type='Income', transaction_date__gte=start_date)
-                # Filter for the last 12 days
-            .values('transaction_date') 
-              # Group by transaction_date
-            .annotate(total_income=Sum('amount')) 
-              # Sum amounts for each date
-            .order_by('transaction_date') 
-              # Order by transaction_date
+            .filter(category_type='Income', transaction_date__gte=start_date, user=request.user)
+            .values('transaction_date')  # Group by transaction_date
+            .annotate(total_income=Sum('amount'))  # Sum amounts for each date
+            .order_by('transaction_date')  # Order by transaction_date
         )
 
-        # Prepare the response with formatted dates
-        chart_data = [
-            {
-                'date': datetime.strptime(str(item['transaction_date']), '%Y-%m-%d').strftime('%b %d'),
-                'total_income': item['total_income'] or 0  # Use 0 if total_income is None
-            }
-            for item in income_data
-        ]
+        # Create a dictionary to store income per day
+        income_by_date = {item['transaction_date']: item['total_income'] for item in income_data}
+
+        # Initialize result for all 12 days
+        chart_data = []
+        for i in range(12):
+            date = start_date + timedelta(days=i)
+            formatted_date = date.strftime('%b %d')
+
+            # Get total income for this day (0 if no income found)
+            total_income = income_by_date.get(date, 0)
+            
+            chart_data.append({
+                'date': formatted_date,
+                'total_income': total_income
+            })
 
         # Calculate the total amount of income across the last 12 days
         total_income = sum(item['total_income'] for item in chart_data)
 
         # Prepare the final response data
         response_data = {
-            'total_income': total_income,
-                # Total income for the last 12 days
-            'daily_income_trend': chart_data, 
-              # Daily income data
+            'total_income': total_income,  # Total income for the last 12 days
+            'daily_income_trend': chart_data,  # Daily income data
         }
 
         return Response(response_data, status=200)
-
-
-
 class TotalExpensesView(APIView):
 
     def get(self, request, month, year=None, *args, **kwargs):
@@ -267,7 +265,17 @@ class BudgetProgressAPIView(generics.RetrieveAPIView):
 class BudgetDashboardView(generics.ListAPIView):
     queryset = Budget.objects.all()
     serializer_class = BudgetDashboardSerializer
-    
+    def get_queryset(self):
+        # Annotate budgets with their percentage spent
+        total_amount_spent = Budget.objects.aggregate(total_spent=Sum('amount_spent'))['total_spent'] or 0
+
+        # If total_amount_spent is zero, we won't perform the percentage calculation
+        if total_amount_spent > 0:
+            return Budget.objects.annotate(
+                percentage_spent=(Sum('amount_spent') / total_amount_spent) * 100
+            ).order_by('-percentage_spent')  # Order by percentage_spent descending
+        else:
+            return Budget.objects.all().order_by('name') 
 
 
 class WeeklySpendingChartView(generics.GenericAPIView):

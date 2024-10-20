@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-hcj$0+dq*t)xqf-08_xmy#0643i$_rag2+s69(mshsd3)nud*e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+PORT = os.environ.get('PORT', '8000') 
 APPEND_SLASH = True
 
 
