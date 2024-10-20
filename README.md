@@ -1,4 +1,5 @@
 Finance Personal Manager
+
 Finance Personal Manager is a comprehensive web application built to help users manage their personal finances by tracking income, expenses, and budgets.
 This application allows users to add, categorize, and monitor financial transactions, set budgets, and visualize their income and spending trends over time.
 
