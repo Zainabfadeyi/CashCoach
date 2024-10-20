@@ -167,14 +167,15 @@ SIMPLE_JWT = {
     # You can add more SIMPLE_JWT se
     # ttings as needed
 }
+import os
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_HOST = 'smtp-relay.brevo.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@zoho.com'
-EMAIL_HOST_PASSWORD = 'your-password'
-DEFAULT_FROM_EMAIL = 'your-email@zoho.com'
-
+EMAIL_HOST_USER = 'zyusuf957@gmail.com'
+EMAIL_HOST_PASSWORD = 'olam20,.'
+# LMrdPsw6YWG4Oqfc
 # Allow all hosts
 ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [
@@ -184,3 +185,6 @@ CORS_ALLOW_CREDENTIALS = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

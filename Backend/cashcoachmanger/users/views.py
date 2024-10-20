@@ -1,5 +1,5 @@
 from rest_framework import viewsets,status,generics
-from .serializers import RegisterationSerializer,LoginSerializer
+from .serializers import RegisterationSerializer,LoginSerializer,ChangePasswordSerializer,EmailChangeSerializer,ProfileImageSerializer
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -85,39 +85,47 @@ class UserDetailsView(viewsets.ViewSet):
         return Response({"message": "Profile updated successfully!"}, status=status.HTTP_200_OK)
 
 
-
 class PasswordResetRequestView(APIView):
     def post(self, request):
         email = request.data.get('email')
         try:
             user = CustomUser.objects.get(email=email)
             otp_instance, created = PasswordResetOTP.objects.get_or_create(user=user)
-            otp_instance.generate_otp()
+
+            # Generate a new OTP
+            otp_instance.generate_otp()  # Make sure this method generates a string
 
             # Send OTP to user's email
             send_mail(
                 'Your OTP for Password Reset',
-                f'Your OTP is: {otp_instance.otp}',
-                'from@example.com',
-                [email],
+                f'Your OTP is: {otp_instance.otp}',  # Ensure otp is a string
+                'zyusuf957@gmail.com',  # Sender's email
+                [email],  # Recipient's email
                 fail_silently=False,
             )
 
             return Response({"message": "OTP sent to your email!"}, status=status.HTTP_200_OK)
         except CustomUser.DoesNotExist:
             return Response({"error": "Email not found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class PasswordResetConfirmationView(APIView):
     def post(self, request):
         email = request.data.get('email')
         otp = request.data.get('otp')
         new_password = request.data.get('new_password')
 
+        # Check the types of the variables
+        if not isinstance(new_password, str):
+            return Response({"error": "New password must be a string."}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             user = CustomUser.objects.get(email=email)
             otp_instance = PasswordResetOTP.objects.get(user=user)
 
             if otp_instance.otp == otp:
-                user.set_password(new_password)
+                user.set_password(new_password)  # Ensure new_password is a string
                 user.save()
                 otp_instance.delete()  # Optionally delete the OTP after use
                 return Response({"message": "Password reset successfully!"}, status=status.HTTP_200_OK)
@@ -127,3 +135,52 @@ class PasswordResetConfirmationView(APIView):
             return Response({"error": "Email not found."}, status=status.HTTP_404_NOT_FOUND)
         except PasswordResetOTP.DoesNotExist:
             return Response({"error": "No OTP found."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data,context={'request': request})
+        
+        if serializer.is_valid():
+            # Check old password
+            user = request.user
+          
+            # Set new password
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            
+            return Response({"message": "Password changed successfully!"}, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangeEmailView(APIView):
+    def put(self, request):
+        user = request.user
+        serializer = EmailChangeSerializer(data=request.data, context={'request': request})
+
+        if serializer.is_valid():
+            new_email = serializer.validated_data['new_email']
+
+            # Update the user's email
+            user.email = new_email
+            user.save()
+
+            return Response({"message": "Email updated successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileImageUploadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        serializer = ProfileImageSerializer(user, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Profile image updated successfully!"}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
