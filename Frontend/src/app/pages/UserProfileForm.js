@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import styles from '../../styles/userProfile.module.css';
+import styles from '../../styles/navbar.module.css';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import ProfilePictureUpload from '../component/userProfile/ProfilePictureUpload';
-// import { userFormService } from '../api/userFormService';
+;
 
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
@@ -119,26 +119,10 @@ const UserProfileForm = () => {
     //     }
     // };
 
-    const handleCancelPasswordChange = () => {
-        setShowPasswordForm(false);
-        setPasswordError('');
-        setPasswordFormData({
-            currentPassword: '',
-            newPassword: '',
-            confirmNewPassword: '',
-        });
-    };
+    const handleConfirmDeleteAccount = () => {
 
-    const handleCancelEmailChange = () => {
-        setShowEmailForm(false);
-        setEmailError('');
-        setEmailFormData({
-            currentPassword: '',
-            newEmail: '',
-            confirmNewEmail: '',
-        });
-    };
-
+    }
+    
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteAccountData, setDeleteAccountData] = useState({
         currentPassword: '',
@@ -181,79 +165,78 @@ const UserProfileForm = () => {
                 <ProfilePictureUpload/>
             </div>
         <div>
-            <h2>User Profile</h2>
-            <label>
-                First Name:
-                <input type="text" name="firstname" value={userProfile.firstname} onChange={handleChange} />
-            </label>
-            <label>
-                Last Name:
-                <input type="text" name="lastname" value={userProfile.lastname} onChange={handleChange} />
-            </label>
-            <label>
-                Email:
-                <input type="email" name="email" value={userProfile.email} readOnly />
-            </label>
-            <button >Change Email</button>
-            {showEmailForm && (
+        <div className={styles.deleteWrapper}>
+    <div>
+      
+    
+      <button onClick={handleDeleteAccount} className={styles.deletebutton}>
+        Delete Account
+      </button>
+      {showDeleteModal && (
+        <div className={styles.modal}>
+        <div className={styles.modalContainer}>
+        <header style={{textAlign:"center", color:"red"}}>Delete Account</header>
+        <div style={{marginBottom:"30px"}}>We'll be sorry to see you go, but thanks for trying Todo!</div>
+          <div className={styles.modalContent}>
+            <form>
+                <div style={{marginBottom:"20px"}}>Deleting your account is permanent. All your data will be wiped out immediately and you won't be able to get it back.</div>
                 <div>
-                    <label>
-                        New Email:
-                        <input type="email" name="newEmail" onChange={handleEmailFormChange} />
-                    </label>
-                    <label>
-                        Confirm New Email:
-                        <input type="email" name="confirmNewEmail" onChange={handleEmailFormChange} />
-                    </label>
-                    <label>
-                        Current Password:
-                        <input type="password" name="currentPassword" onChange={handleEmailFormChange} />
-                    </label>
-                    {emailError && <p>{emailError}</p>}
-                    <button >Cancel</button>
-                    <button >Change Email</button>
-                </div>
-            )}
-            <label>
-                Password:
-                <button >Change Password</button>
-            </label>
-            {showPasswordForm && (
-                <div>
-                    <label>
-                        Current Password:
-                        <input type="password" name="currentPassword" onChange={handlePasswordFormChange} />
-                    </label>
-                    <label>
-                        New Password:
-                        <input type="password" name="newPassword" onChange={handlePasswordFormChange} />
-                    </label>
-                    <label>
-                        Confirm New Password:
-                        <input type="password" name="confirmNewPassword" onChange={handlePasswordFormChange} />
-                    </label>
-                    {passwordError && <p>{passwordError}</p>}
-                    <button onClick={handleCancelPasswordChange}>Cancel</button>
-                    <button >Change Password</button>
-                </div>
-            )}
-            <button onClick={handleDeleteAccount}>Delete Account</button>
-            {showDeleteModal && (
-                <div>
-                    <h3>Delete Account</h3>
-                    <p>This will immediately delete all of your data including tasks, projects, comments, and more. This can’t be undone.</p>
-                    <label>
-                        Reason for Delete (Optional):
-                        <input type="text" onChange={(e) => setDeleteAccountData((prevData) => ({ ...prevData, reason: e.target.value }))} />
-                    </label>
-                    <label>
-                        Current Password:
-                        <input type="password" onChange={(e) => setDeleteAccountData((prevData) => ({ ...prevData, currentPassword: e.target.value }))} required />
-                    </label>
-                    <button onClick={handleCloseDeleteModal}>Cancel</button>
-                    <button >Yes, Delete</button>
-                </div>
-            )}
+                <label htmlFor="reason" className={styles.label}>
+                  Reason for Delete (Optional):
+                </label>
+                <textarea
+                  id="reason"
+                  name="reason"
+                  value={deleteAccountData.reason}
+                  onChange={(e) =>
+                    setDeleteAccountData((prevData) => ({
+                      ...prevData,
+                      reason: e.target.value,
+                    }))
+                  }
+                  className={styles.modaltextinput}
+                />
+              </div>
+              <div>
+                <label htmlFor="currentPassword" className={styles.label}>
+                  Current Password:
+                </label>
+                <input
+                  type="password"
+                  id="currentPassword"
+                  name="currentPassword"
+                  value={deleteAccountData.currentPassword}
+                  onChange={(e) =>
+                    setDeleteAccountData((prevData) => ({
+                      ...prevData,
+                      currentPassword: e.target.value,
+                    }))
+                  }
+                  className={styles.modalinput}
+                  required
+                />
+              </div>
+              
+            </form>
+            <div className={styles.modalButton}>
+            <button onClick={handleCloseDeleteModal} className={styles.button}
+            style={{marginRight:"8px"}}>
+              Cancel
+            </button>
+            <button
+              onClick={handleConfirmDeleteAccount}
+              className={styles.button}
+              style={{backgroundColor:"red"}}
+            >
+              Yes, Delete
+            </button>
+            </div>
+          </div>
+        </div>
+        </div>
+      )}
+      </div>
+      </div>
         </div>
         </div>
     );

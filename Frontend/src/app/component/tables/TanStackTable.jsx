@@ -8,9 +8,7 @@ import {
 } from "@tanstack/react-table";
 import { useState, useEffect } from "react";
 import DebouncedInput from "./DebouncedInput";
-import { CiSearch } from "react-icons/ci";
 import styles from "../../../styles/table.module.css";
-import { TRANSACTIONS } from "../../data"; // Adjust the import based on your file structure
 import ActionsDropdown from "../../component/mainpage/ActionDropdown";
 import { useFetchTransactions } from "../../../api/apiFolder/tableApi";
 import DownloadBtn from './DownloadBtn'

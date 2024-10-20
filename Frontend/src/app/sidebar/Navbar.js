@@ -11,8 +11,8 @@ const Navbar = ({ selectedItem }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const firstName = useSelector((state) => state.auth.user?.firstName);
-  const lastName = useSelector((state) => state.auth.user?.lastName);
+  const first_name = useSelector((state) => state.auth.user.user.first_name);
+  const last_name = useSelector((state) => state.auth.user.user.last_name);
   
   const [dropdownOpen, setDropdownOpen] = useState(false); // State to control dropdown visibility
 
@@ -38,7 +38,7 @@ const Navbar = ({ selectedItem }) => {
       </div>
       <div className={styles.placeholder} onClick={handleProfileClick}>
         <img
-          src={`https://ui-avatars.com/api/?background=2F2CD8&color=fff&name=${firstName}+${lastName}`}
+          src={`https://ui-avatars.com/api/?background=2F2CD8&color=fff&name=${first_name}+${last_name}`}
           alt=""
           className={styles.profile}
         />

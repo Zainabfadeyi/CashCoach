@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../../styles/expenses.module.css';
-import CircleProgress from '../component/analytics/CircleProgress';
+import CircularIncome from '../component/analytics/CircularIncome';
 import LoadingSpinner from '../component/LoadingSpinner'; // Import your loading spinner
 import TanStackTable from '../component/tables/TanStackTable';
 
@@ -27,7 +27,7 @@ const Expenses = () => {
 
         <>
           <div style={{ width: "30%" }}>
-            <CircleProgress />
+            <CircularIncome />
           </div>
           <div style={{ width: "70%" }}>
             <TanStackTable/>

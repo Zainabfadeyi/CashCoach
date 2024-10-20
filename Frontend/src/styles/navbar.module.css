@@ -117,5 +117,166 @@
   border-radius: 10px;
   padding: 15px;
   background-color: #fff;
+  width: 100%;
  
+}
+.field{
+  margin: 15px;
+  column-gap: 30px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 5px;
+  
+}
+
+.input {
+
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box; 
+   border-radius: 10px;
+  border: 1px solid #f5f5f5;
+  box-shadow: rgba(0, 0, 0, 0.5);
+}
+
+.button {
+  background-color: navy;
+  color: #fff;
+  padding: 10px 15px;
+  border: 1px solid blue;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.button:hover {
+  background-color: blue;
+}
+
+.passwordForm {
+  margin-top: 20px;
+}
+.emailWrapper{
+  margin-top: 20px;
+  display: block;
+  
+}
+.passwordWrapper{
+  margin-top: 20px;
+  display: block;
+  
+}
+.deleteWrapper{
+  padding: 20px;
+  justify-content: flex-end;
+
+  display: flex;
+  
+}
+.deletebutton {
+  background-color:white;
+  color: #fff;
+  padding: 10px 15px;
+  border: 1px solid red;
+  border-radius: 5px;
+  cursor: pointer;
+  color: red;
+}
+.deletebutton:hover{
+  background-color: red;
+  color: #fff;
+}
+.modalContainer {
+  /* Styles for the modal container */
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  width: 50%;
+  padding: 50px;
+  
+}
+.modalContent {
+  /* Styles for the modal content */
+  text-align: left;
+}
+.modal{
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background-color: rgba(0, 0, 0, 0.5);
+display: flex;
+align-items: center;
+justify-content: center;
+
+
+}
+.modalinput{
+  width: 60%;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  
+}
+.modaltextinput{
+  width: 70%;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  
+}
+.modalButton{
+  display: flex;
+  width: 100%;
+  justify-content: right;
+  
+}
+.error {
+  color: red;
+  margin-top: 5px;
+}
+.passwordinput{
+  width: 70%;
+  padding: 8px;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  
+}
+.passandemail{
+  box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #fff;
+  width: 100%;
+}
+.profileField{
+  box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #fff;
+  width: 100%;
+}
+.overall{
+  padding: 25px;
+  width: 100%;
+}
+.profileName{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 0 solid #e5eaef;
+  background-color: transparent;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1F2C73;
+  margin-bottom: 15px;
 }

@@ -1,0 +1,271 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito&display=swap');
+
+.cover{
+    display: flex;
+    background-image: url('../../public/wallpaper.jpg'); /* Make sure to specify the correct image file name and extension */
+    background-size: cover; /* This will make the image cover the entire background */
+    background-position: center; /* Center the image */
+    height: 100vh; 
+
+}
+.Reg {
+    width: 100%;
+    display: flex;
+    background-image: url('../../public/wallpaper.jpg'); /* Make sure to specify the correct image file name and extension */
+    background-size: cover; /* This will make the image cover the entire background */
+    background-position: center; /* Center the image */
+    
+}
+.formReg{
+    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 5px;
+    border-radius: 10px;
+
+}
+.RegContainer{
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+
+}
+.LoginContainer{
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    align-items: center;
+
+}
+.ImgContainer{
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-size: 50px;
+}
+.RegImage{
+    width: 100%;
+    height: auto;
+}
+
+
+.Login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 95%;
+    max-width: 1000px;
+    margin: 0 auto;
+    height: 100dvh;
+
+    
+}
+.Reg{
+    display: flex;
+    align-items: center;
+    
+    margin: 0 auto;
+
+}
+.LogoWrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    column-gap: 10px;
+    width: 100%;
+}
+.LogoWrapper a {
+    font-size: 50px;
+    text-decoration: none;
+}
+.LogoWrapper a div {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+.LogoWrapper a span{
+    /* color: #1C2237; */
+    font-weight: 600;
+}
+
+.sectionReg {
+  width: 100%;
+  max-width: 55%;
+  height: max-content;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px;
+  border: #f5f5f5 1px solid;
+  border-radius: 15px;
+  background-color: transparent;
+  color: white;
+}
+.sectionLogin {
+    width: 100%;
+    max-width: 40%;
+    height: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 10px;
+    border: #f5f5f5 1px solid;
+    border-radius: 15px;
+    background-color: transparent;
+    color: white;
+  }
+.success{
+    display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: white;
+  width: 100%;
+  padding: 20px;
+  align-content: center;
+
+}
+
+
+
+.inputReg{
+    border-radius: 10px;
+    border: 1px solid #c5c5c5;
+    width: 100%;
+    font-size: 15px;
+    padding: 2px 5px 2px 5px;
+    margin-bottom: 10px;
+}
+
+
+.regLabel{
+  margin: 0 0 2px 0;
+  font-size: 12px !important;
+  font-weight: 400;
+  justify-content: flex-start;
+  display: flex;
+  width: 100%;
+ 
+}
+.name{
+    font-size: 15px;
+    font-weight: 900;
+    padding: 5px;
+    color: white;
+
+}
+
+.buttonReg {
+  margin: 5px 0;
+  background: #1C2237;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  height: 30px;
+  width: 100%;
+}
+
+.instructions {
+    font-size: 0.75rem;
+    border-radius: 0.5rem;
+    background: #000;
+    color: #fff;
+    padding: 0.25rem;
+    position: relative;
+    bottom: -10px;
+}
+
+.instructions > svg {
+    margin-right: 0.25rem;
+}
+
+.offscreen {
+    position: absolute;
+    left: -9999px;
+}
+
+.hide {
+    display: none;
+}
+
+.valid {
+    color: limegreen;
+    margin-left: 0.25rem;
+}
+
+.invalid {
+    color: red;
+    margin-left: 0.25rem;
+}
+
+.errmsg {
+    background-color: lightpink;
+    color: firebrick;
+    font-weight: bold;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.line {
+    display: inline-block;
+}
+.suggest {
+    font-size: 14px;
+    font-weight: 600;
+}
+.suggest a {
+    color: #555;
+    padding-left: 5px;
+}
+.suggest a:hover{
+    color:#1C2237
+}
+@media screen and (max-width: 700px) {
+    .RegContainer{
+        width: 100%;
+    }
+    .ImgContainer{
+        display: none;
+    }
+}
+.clearButton{
+    margin: 20px 0;
+  background: red;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  height: 40px;
+  padding: 5px;
+}
+
+.signButton{
+    margin: 20px 0;
+  background: #002534;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  height: 40px;
+  padding: 5px;
+}
+
+.checkbox{
+    padding: 10px;
+    font-size: 20px;
+}
+.twofa{
+    font-size: 20px;
+
+}
+.ButtonStyle{
+    color: WHITE;
+    border: none;
+    background-color: RED;
+    padding: 10px;
+
+}

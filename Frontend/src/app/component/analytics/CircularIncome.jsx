@@ -10,41 +10,41 @@ import LoadingSpinner from '../LoadingSpinner';
     return (
       <div className={styles.circularProgress}>
         <svg width="200" height="200">
-          <circle
-            cx="100"
-            cy="100"
-            r="80"
-            fill="none"
-            stroke="#e9ecef"
-            strokeWidth="20"
-          />
-          <circle
-            cx="100"
-            cy="100"
-            r="80"
-            fill="none"
-            stroke="#2F2CD8"
-            strokeWidth="20"
-            strokeDasharray="251 251"
-            strokeDashoffset="251"
-            strokeLinecap="round"
-            transform="rotate(90 100 100)"
-          />
-          <circle
-            cx="100"
-            cy="100"
-            r="80"
-            fill="none"
-            stroke="#F4F4FD"
-            strokeWidth="20"
-            strokeDasharray="251 251"
-            strokeDashoffset="-251"
-            strokeLinecap="round"
-            transform="rotate(-90 100 100)"
-          />
-          <text x="100" y="105" textAnchor="middle" fontSize="16" fill="#000">
-            {incomePercentage.toFixed(0)}% / {expensePercentage.toFixed(0)}%
-          </text>
+        <circle
+          cx="100"
+          cy="100"
+          r="80"
+          fill="none"
+          stroke="#e9ecef"
+          strokeWidth="20"
+        />
+        <circle
+          cx="100"
+          cy="100"
+          r="80"
+          fill="none"
+          stroke="#2F2CD8"
+          strokeWidth="20"
+          strokeDasharray="251 251"
+          strokeDashoffset={(251 * (100 - incomePercentage)) / 100}
+          strokeLinecap="round"
+          transform="rotate(90 100 100)"
+        />
+        <circle
+          cx="100"
+          cy="100"
+          r="80"
+          fill="none"
+          stroke="#F4F4FD"
+          strokeWidth="20"
+          strokeDasharray="251 251"
+          strokeDashoffset={(251 * (100 - expensePercentage)) / 100}
+          strokeLinecap="round"
+          transform="rotate(-90 100 100)"
+        />
+        <text x="100" y="105" textAnchor="middle" fontSize="16" fill="#000">
+          {incomePercentage.toFixed(2)}% / {expensePercentage.toFixed(2)}%
+        </text>
         </svg>
       </div>
     );
@@ -52,10 +52,40 @@ import LoadingSpinner from '../LoadingSpinner';
   
   const ProgressBars = () => {
     const [transactions, setTransactions] = useState([]);
-    const [totalIncome, setTotalIncome] = useState(5000); // Example total income value
     const [isLoading, setIsLoading] = useState(true); // Track loading state
     const accessToken = useSelector((state) => state.auth.accessToken);
+    const [incomePercentage, setIncomePercentage] = useState(0);
+    const [expensePercentage, setExpensePercentage] = useState(0);
     // Fetch data from the API
+    // Fetch progress data (income/expenses percentages)
+  useEffect(() => {
+    const fetchProgressData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await axios.get('income-expense-Progress/', {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const data = response.data;
+
+        // Strip the '%' and convert to numbers
+        const income = parseFloat(data.income_percentage.replace('%', ''));
+        const expense = parseFloat(data.expenses_percentage.replace('%', ''));
+
+        setIncomePercentage(income);
+        setExpensePercentage(expense);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching progress data:', error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchProgressData();
+  }, [accessToken]);
+
+
     useEffect(() => {
       const fetchTransactions = async () => {
         try {
@@ -84,10 +114,7 @@ import LoadingSpinner from '../LoadingSpinner';
       return <div><LoadingSpinner  size={50} message="Processing..."/></div>;
     }
   
-    // Calculate expense percentages (adjusted from API data)
-    const totalExpense = transactions.reduce((sum, t) => sum + parseFloat(t.amount), 0);
-    const expensePercentage = (totalExpense / totalIncome) * 100;
-    const incomePercentage = 100 - expensePercentage;
+  
   
     return (
       <div className={styles.progressWrapper}>

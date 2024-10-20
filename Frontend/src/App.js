@@ -15,14 +15,20 @@ import Analytics from './app/pages/Analytics';
 import Expenses from './app/pages/Expenses';
 import Income from './app/pages/Income';
 import IncvsExp from './app/pages/IncvsExp';
+import LayoutHome from './app/layout/LayountHome';
+import Home from './app/component/landingpage/pages/homEPage/Home';
 
 
 const App = () => {
   return (
     <Router>
       <div className={styles.app}>
+    
         
           <Routes>
+          <Route path="/" element={<LayoutHome />}>
+            <Route path="/" element={<Home />} />
+          </Route>
           <Route path= '/login' element={<Login/>}/>
           <Route path= '/register' element={<Register/>}/>
 
