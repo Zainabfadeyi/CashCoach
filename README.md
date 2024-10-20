@@ -52,7 +52,7 @@ Prerequisites
   React
 
 Backend Setup (Django)
-1.  Clone the repository:git clone https://github.com/yourusername/finance-personal-manager.git
+1.  Clone the repository:git clone https://github.com/zeehy123/finance-personal-manager.git
 cd finance-personal-manager
 2.  Create and activate a virtual environment:python -m venv env
 source env/bin/activate  # For Windows: env\Scripts\activate
