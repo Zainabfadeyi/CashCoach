@@ -501,51 +501,54 @@ class ExpenseOverviewView(APIView):
         return Response(expense_data)
 
 
-def income_transactions(request):
-    # Fetch all transactions where category_type is 'Income'
-    transactions = Transaction.objects.filter(category_type='Income')
 
-    # Prepare the response data
-    transactions_data = [
-        {
-            'id': transaction.id,  
-            'category': transaction.category,
-            'description':transaction.description,
-            'amount': transaction.amount,
-            'category_type': transaction.category_type,
-            'transaction_date':transaction.transaction_date,
-            'created_at': transaction.created_at, 
-        }
-        for transaction in transactions
-    ]
+class IncomeTransactionsView(APIView):
+    def get(self, request):
+        # Fetch all transactions where category_type is 'Expenses'
+        transactions = Transaction.objects.filter(category_type='Income')
 
-    # Return the data as JSON
-    return JsonResponse(transactions_data, safe=False)
+        # Prepare the response data
+        transactions_data = [
+            {
+                'id': transaction.id,
+                'category': transaction.category,
+                'description': transaction.description,
+                'amount': transaction.amount,
+                'category_type': transaction.category_type,
+                'transaction_date': transaction.transaction_date,
+                'created_at': transaction.created_at,
+            }
+            for transaction in transactions
+        ]
 
-
-def expense_transactions(request):
-    # Fetch all transactions where category_type is 'Income'
-    transactions = Transaction.objects.filter(category_type='Expenses')
-
-    # Prepare the response data
-    transactions_data = [
-        {
-            'id': transaction.id,  
-            'category': transaction.category,
-            'description':transaction.description,
-            'amount': transaction.amount,
-            'category_type': transaction.category_type,
-            'transaction_date':transaction.transaction_date,
-            'created_at': transaction.created_at, 
-        }
-        for transaction in transactions
-    ]
-
-    # Return the data as JSON
-    return JsonResponse(transactions_data, safe=False)
+        # Return the data as a JSON response
+        return Response(transactions_data, status=200)
 
 
 
+
+class ExpenseTransactionsView(APIView):
+    def get(self, request):
+        # Fetch all transactions where category_type is 'Expenses'
+        transactions = Transaction.objects.filter(category_type='Expenses')
+
+        # Prepare the response data
+        transactions_data = [
+            {
+                'id': transaction.id,
+                'category': transaction.category,
+                'description': transaction.description,
+                'amount': transaction.amount,
+                'category_type': transaction.category_type,
+                'transaction_date': transaction.transaction_date,
+                'created_at': transaction.created_at,
+            }
+            for transaction in transactions
+        ]
+
+        # Return the data as a JSON response
+        return Response(transactions_data, status=200)
+    
 class IncomeandExpenseProgressView(APIView):
     def get(self, request):
         # Fetch total income and income transaction count
@@ -565,21 +568,60 @@ class IncomeandExpenseProgressView(APIView):
         )
 
         total_income = income_data['total_income'] or 0
+        total_income_count = income_data['total_income_count'] or 0
         total_expenses = expense_data['total_expenses'] or 0
+        total_expenses_count = expense_data['total_expenses_count'] or 0
 
-        # Calculate total for percentage calculation
-        total_amount = total_income + total_expenses
-
-        # Calculate income percentage
-        if total_amount > 0:
-            income_percentage = (total_income / total_amount) * 100
-            expenses_percentage = (total_expenses / total_amount) * 100
+        # Calculate income percentage based on total income per transaction
+        if total_income_count > 0:
+            average_income_per_transaction = total_income / total_income_count
+            income_percentage = (average_income_per_transaction / total_income) * 100
         else:
             income_percentage = 0
-            expenses_percentage = 0
 
-        # Round percentages to two decimal places and return them as strings with '%' symbol
+        # Calculate expenses percentage based on total income
+        if total_expenses_count > 0:
+            average_expenses_per_transaction = total_expenses / total_expenses_count
+            expenses_percentage = (average_expenses_per_transaction / total_expenses) * 100
+        else:
+            expenses_percentage = 0
+       
+
+        # Return percentages as strings with '%' symbol
         return Response({
             "income_percentage": f"{round(income_percentage, 2)}%",
             "expenses_percentage": f"{round(expenses_percentage, 2)}%"
         })
+
+class EditCategoryView(generics.UpdateAPIView):
+    queryset = AllCategory.objects.all()
+    serializer_class = CategorySerializer
+
+    def update(self, request, *args, **kwargs):
+        category = self.get_object()  
+        # Get the category to be updated
+        old_name = category.name 
+         
+
+      
+        response = super().update(request, *args, **kwargs)
+
+        # Update all transactions that used the old category name
+        Transaction.objects.filter(category=old_name).update(category=request.data['name'])
+
+        return response
+    
+
+class DeleteCategoryView(generics.DestroyAPIView):
+    queryset = AllCategory.objects.all()
+
+    def destroy(self, request, *args, **kwargs):
+        category = self.get_object()  # Get the category to be deleted
+
+        # Delete all transactions associated with this category
+        Transaction.objects.filter(category=category.name).delete()
+
+        # Perform the category deletion
+        category.delete()
+
+        return Response(status=200)

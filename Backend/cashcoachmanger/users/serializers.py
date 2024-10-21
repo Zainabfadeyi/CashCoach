@@ -6,6 +6,8 @@ from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.contrib.auth.password_validation import validate_password
+
 
 class CustomUserSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(read_only=True)  # Assuming public_id is the user ID
@@ -70,3 +72,54 @@ class LoginSerializer(TokenObtainPairSerializer):
             raise ValidationError('Invalid email/password')
 
         return data
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_new_password = serializers.CharField(required=True)
+
+    def validate(self, data):
+       
+        # Check if the new password and confirm new password match.
+     
+        if data['new_password'] != data['confirm_new_password']:
+            raise serializers.ValidationError("New password and Confirm password do not match.")
+        return data
+    def validate_old_password(self, value):
+        # Validate the old password
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Current password is incorrect.")
+        return value
+    
+
+class EmailChangeSerializer(serializers.Serializer):
+    new_email = serializers.EmailField(required=True)
+    confirm_new_email = serializers.EmailField(required=True)
+    current_password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        user = self.context['request'].user
+        new_email = data.get('new_email')
+        confirm_new_email = data.get('confirm_new_email')
+        current_password = data.get('current_password')
+
+        # Check if the current password is correct
+        if not user.check_password(current_password):
+            raise serializers.ValidationError({"current_password": "Current password is incorrect."})
+
+        # Check if the new email matches the confirm email
+        if new_email != confirm_new_email:
+            raise serializers.ValidationError({"email_mismatch": "New email and confirm email do not match."})
+
+        # Optionally, check if the email is already in use by another user
+        if user.__class__.objects.filter(email=new_email).exists():
+            raise serializers.ValidationError({"email_exists": "This email is already in use."})
+
+        return data
+
+class ProfileImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['image']
