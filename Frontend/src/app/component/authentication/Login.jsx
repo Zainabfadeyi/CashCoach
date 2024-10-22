@@ -59,7 +59,7 @@ import React, {
             setSuccess(true);
             setCustomMessage('Login successful!, You are logged in. Redirecting...');
         setTimeout(() => {
-          window.location.href = '/dashboard';}, 2000)
+          window.location.href = '/budget';}, 2000)
            
             const userDetailsResponse = await axios.get('user/details/', {
               headers: { Authorization: `Bearer ${response?.data?.access}` },
