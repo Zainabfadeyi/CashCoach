@@ -568,26 +568,20 @@ class IncomeandExpenseProgressView(APIView):
         )
 
         total_income = income_data['total_income'] or 0
-        total_income_count = income_data['total_income_count'] or 0
         total_expenses = expense_data['total_expenses'] or 0
-        total_expenses_count = expense_data['total_expenses_count'] or 0
 
-        # Calculate income percentage based on total income per transaction
-        if total_income_count > 0:
-            average_income_per_transaction = total_income / total_income_count
-            income_percentage = (average_income_per_transaction / total_income) * 100
+        # Calculate total for percentage calculation
+        total_amount = total_income + total_expenses
+
+        # Calculate income percentage
+        if total_amount > 0:
+            income_percentage = (total_income / total_amount) * 100
+            expenses_percentage = (total_expenses / total_amount) * 100
         else:
             income_percentage = 0
-
-        # Calculate expenses percentage based on total income
-        if total_expenses_count > 0:
-            average_expenses_per_transaction = total_expenses / total_expenses_count
-            expenses_percentage = (average_expenses_per_transaction / total_expenses) * 100
-        else:
             expenses_percentage = 0
-       
 
-        # Return percentages as strings with '%' symbol
+        # Round percentages to two decimal places and return them as strings with '%' symbol
         return Response({
             "income_percentage": f"{round(income_percentage, 2)}%",
             "expenses_percentage": f"{round(expenses_percentage, 2)}%"

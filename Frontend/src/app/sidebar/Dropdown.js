@@ -8,8 +8,8 @@ import { IoLogOutOutline } from "react-icons/io5";
 const Dropdown = ({ onProfileClick, onLogoutClick }) => {
   const username= useSelector((state) => state.auth.user.user.username);
   const email= useSelector((state) => state.auth.user.user.email);
-  const firstName = useSelector((state) => state.auth.user?.firstName);
-  const lastName = useSelector((state) => state.auth.user?.lastName);
+  const firstName = useSelector((state) => state.auth.user.user.first_name);
+  const lastName = useSelector((state) => state.auth.user.user.last_name);
   
   return (
     <div className={styles.dropdown}>

@@ -24,7 +24,7 @@ export const useFetchTransactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const apiUrl = `income/transactions/`;
+      const apiUrl = `income-transactions/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -39,7 +39,7 @@ export const useFetchTransactions = () => {
   };
   const fetchExpTransactions = async () => {
     try {
-      const apiUrl = `expenses/transactions/`;
+      const apiUrl = `expenses-transactions/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
