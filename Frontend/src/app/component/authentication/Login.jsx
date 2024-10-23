@@ -2,8 +2,6 @@ import React, {
     useRef,
     useState,
     useEffect,
-    useContext,
-    FormEvent,
   } from "react";
   import styles from "../../../styles/reg.module.css";
   import axios from '../../../api/axios';
@@ -59,7 +57,7 @@ import React, {
             setSuccess(true);
             setCustomMessage('Login successful!, You are logged in. Redirecting...');
         setTimeout(() => {
-          window.location.href = '/budget';}, 2000)
+          window.location.href = '/dashboard';}, 2000)
            
             const userDetailsResponse = await axios.get('user/details/', {
               headers: { Authorization: `Bearer ${response?.data?.access}` },
@@ -91,89 +89,7 @@ import React, {
       
     };
   
-  //   return (
-  //     < >
-      
-  //       <div className="Login">
-  //         {customMessage ? (
-  //           <section className="sectionReg">
-  //             <h1>{customMessage}</h1>
-  //           </section>
-  //         ) : (
-  //           <div className="RegContainer">
-  //             <div className="LogoWrapper"> 
-  //                 <Link to={"/register"}>
-  //                     <div style={{display:"flex", alignItems:"center"}}> 
-  //                         <FaFingerprint/>
-  //                         <div style={{color:"black"}}>Cash Coach</div>
-  //                     </div> 
-  //                 </Link>
-  //               </div>
-  //           <section className="sectionReg">
   
-  //             <p
-  //               ref={errRef}
-  //               className={errMsg ? "errmsg" : "offscreen"}
-  //               aria-live="assertive"
-  //             >
-  //               {errMsg}
-  //             </p>
-  //             <h1>Sign In</h1>
-  //             <form onSubmit={handleSubmit}
-  //             className="formReg">
-  //               <label htmlFor="username" className="RegLabel">Email:</label>
-  //               <input 
-  //               className="inputReg"
-  //                 type="text"
-  //                 id="email"
-  //                 ref={userRef}
-  //                 autoComplete="off"
-  //                 onChange={(e) => setEmail(e.target.value)}
-  //                 value={email}
-  //                 required
-  //               />
-  
-  //               <label htmlFor="password" className="RegLabel">Password:</label>
-  //               <input
-  //               className="inputReg"
-  //                 type="password"
-  //                 id="password"
-  //                 onChange={(e) => setPwd(e.target.value)}
-  //                 value={pwd}
-  //                 required
-  //               />
-  //               <div style={{display:"flex", justifyContent:"right"}}>
-  //                   <a
-  //                       href="/forgotPassword"
-  //                       onClick={() => setShowForgotPassword(true)}
-  //                     >
-  //                       Forgot Password?
-  //                     </a>
-  //               </div>
-  
-  //               <button type="submit" className="buttonReg" >Sign In</button>
-  //             </form>
-  //             <p className="suggest">
-  //               Need an Account?
-  //               <span className="line">
-  //                   <Link to="/register">Sign up</Link>
-  //                 </span>
-                 
-  //             </p>
-              
-  //           </section>
-  //           </div>
-  //         )}
-  
-  //         <div className="ImgContainer">
-  //             <img src="/savings.svg"  className="RegImageLogin" />
-  //         </div>
-  //       </div>
-  //     </>
-  //   );
-  // };
-  
-  // export default Login;
   return (
     < >
     
@@ -204,7 +120,7 @@ import React, {
                 {errMsg}
               </p>
               <div className={styles.name}>Login</div>
-              <form action="login" className={styles.formReg} onSubmit={handleSubmit}>
+              <div className={styles.formReg} >
               <label className={styles.regLabel}>Email:</label>
                 <input 
                 className={styles.inputReg}
@@ -237,7 +153,7 @@ import React, {
                 >
                   <Link to="/forgotPassword">Forgot Password?</Link>
                 </div>
-                <button type="submit" className={styles.buttonReg}>
+                <button type="submit" onClick={handleSubmit} className={styles.buttonReg}>
                   Sign In
                 </button>
                 <p>
@@ -246,7 +162,7 @@ import React, {
                     <Link to="/register">Sign up</Link>
                   </span>
                 </p>
-              </form>
+              </div>
             </section>
           </div>
         )}

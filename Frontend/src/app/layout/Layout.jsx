@@ -14,7 +14,7 @@ const LayoutComp = () => {
 
   useEffect(() => {
     const authState = localStorage.getItem("authState");
-    const token = authState ? JSON.parse(authState).accesssToken : null;
+    const token = authState ? JSON.parse(authState).accessToken : null;
 
     if (token) {
       setAuthToken(token);

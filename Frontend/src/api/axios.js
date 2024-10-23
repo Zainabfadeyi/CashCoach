@@ -2,7 +2,9 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const instance = axios.create({
-  baseURL: "https://cashcoach.onrender.com/api/",
+  baseURL: 
+  "https://cashcoach.onrender.com/api/",
+  // "http://127.0.0.1:8000/api/"
 });
 
 // Add a request interceptor
