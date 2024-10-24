@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from '../../../api/hook';
 import styles from '../../../styles/navbar.module.css';
 import axios from '../../../api/axios';
@@ -42,7 +42,26 @@ const ProfilePictureUpload = () => {
       reader.readAsDataURL(file);
     }
   };
-  
+  const fetchProfileImage = async () => {
+    try {
+      const response = await axios.get('profile/image/', {
+        headers: {
+          'Authorization': `Bearer ${accessToken}` // If you're using token-based auth
+        }
+      });
+      const imageUrl = response.data.image_url;
+      setImagePreviewUrl(`https://cashcoach.onrender.com${response.data.image_url}`);
+    } catch (error) {
+      console.error('Error fetching profile image:', error);
+      // Fallback to default avatar if error or no image exists
+    }
+  };
+
+  // Fetch profile image on component mount
+  useEffect(() => {
+    fetchProfileImage();
+  }, []);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -195,10 +214,11 @@ const ProfilePictureUpload = () => {
         <div style={{display: "flex", alignItems: "center", columnGap: "20px"}}>
           <div>
             <img
-              src={imagePreviewUrl 
-                    ? imagePreviewUrl 
-                    : `https://ui-avatars.com/api/?background=2F2CD8&color=fff&name=${firstName}+${lastName}`
-              }
+              // src={imagePreviewUrl 
+              //       ? imagePreviewUrl 
+              //       : `https://ui-avatars.com/api/?background=2F2CD8&color=fff&name=${firstName}+${lastName}`
+              // }
+              src={imagePreviewUrl || `https://ui-avatars.com/api/?background=2F2CD8&color=fff&name=${firstName}+${lastName}`}
               alt="Profile"
               className={styles.profile}
               style={{ width: '70px', height: '70px', borderRadius: '50%' }}
