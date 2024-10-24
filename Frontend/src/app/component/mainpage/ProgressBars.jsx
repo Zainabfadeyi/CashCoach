@@ -1,93 +1,3 @@
-// import React, { useEffect, useState } from 'react';
-// import { ProgressBar } from 'react-bootstrap';
-// import axios from '../../../api/axios';
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// import styles from '../../../styles/dashboard.module.css';
-// import { useSelector } from '../../../api/hook';
-
-// const ProgressBars = () => {
-//   const [categoryData, setCategoryData] = useState([]);
-//   const [totalAmount, setTotalAmount] = useState(0);
-//   const accessToken = useSelector((state) => state.auth.accessToken)
-
-//   const categoryColors = {
-//     Mum: '#28a745',
-//     Dad: '#17a2b8',
-//     Girlfriend: '#ffc107',
-//     Groceries: '#dc3545',
-//     Gifts: '#007bff',
-//     Skincare: '#6c757d',
-//     Travel: '#343a40',
-//   };
-
-//   useEffect(() => {
-//     // Fetch data from the API
-//     axios.get('/dashboard/monthly-expense-breakdown/',
-//       {
-//         headers: {
-//           Authorization: `Bearer ${accessToken}`,
-//         },}
-
-//     )
-//       .then(response => {
-//         const data = response.data;
-        
-//         // Calculate the total amount
-//         const total = data.reduce((acc, item) => acc + item.amount, 0);
-        
-//         setCategoryData(data);
-//         setTotalAmount(total);
-//       })
-//       .catch(error => {
-//         console.error('Error fetching data:', error);
-//       });
-//   }, []);
-
-//   return (
-//     <div className={styles.progressLine}>
-//       <div>
-//         <div style={{ fontSize: "20px", fontWeight: "700", color:"#1F2C73", paddingBottom:"20px" }}>
-//           Monthly Expenses Breakdown
-//         </div>
-//         <ProgressBar style={{ height: '15px', marginBottom:"20px" }}>
-//           {categoryData.map((item, index) => (
-//             <ProgressBar
-//               key={index}
-//               now={item.percentage}
-//               style={{ backgroundColor: categoryColors[item.name] || '#ccc' }}
-//               isChild
-//             />
-//           ))}
-//         </ProgressBar>
-//       </div>
-
-//       <div className={styles.categoryList}>
-//         {categoryData.map((item, index) => (
-//           <div key={index} className={styles.OverallPrg} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px', color:"#7184AD" }}>
-//             <div
-//               style={{
-//                 display: 'inline-block',
-//                 width: '15px',
-//                 height: '15px',
-//                 borderRadius: '50%',
-//                 backgroundColor: categoryColors[item.name] || '#ccc',
-//                 marginRight: '10px',
-//                 border: "1px solid #c5c5c5",
-//                 padding: "7px"
-//               }}
-//             />
-//             <span style={{ fontWeight: 'bold', flexGrow: 1 }}>{item.name}</span>
-//             <span style={{ marginLeft: '10px', fontSize:"18px" }}>₦{item.amount.toFixed(2)}</span>
-//             <span style={{ marginLeft: '10px', fontWeight:"900", fontSize:"18px" }}>{item.percentage.toFixed(2)}%</span>
-//           </div>
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default ProgressBars;
-
 import React, { useEffect, useState } from 'react';
 import { ProgressBar } from 'react-bootstrap';
 import axios from '../../../api/axios';
@@ -100,7 +10,6 @@ const ProgressBars = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const accessToken = useSelector((state) => state.auth.accessToken);
 
-  // Define a set of colors to cycle through dynamically
   const colorPalette = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#007bff', '#6c757d', '#343a40', '#8e44ad', '#e74c3c', '#f39c12'];
 
   useEffect(() => {

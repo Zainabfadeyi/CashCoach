@@ -58,7 +58,7 @@ const BudgetLineChart =  ({ budgetId })  => {
   return (
     <div className={styles.LineChart}>
       <div>
-        <div style={{ fontSize: '22px', fontWeight: '600', color: '#1F2C73' }}>Budget Period</div>
+        <div style={{ fontSize: '20px', fontWeight: '600', color: '#1F2C73' }}>Budget Period</div>
       </div>
       <div style={{ height: '400px', width: '100%' }}>
         <ResponsiveLine

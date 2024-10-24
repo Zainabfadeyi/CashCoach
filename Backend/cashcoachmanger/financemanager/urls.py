@@ -18,7 +18,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from django.contrib import admin
-from users.views import RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView,PasswordResetRequestView, PasswordResetConfirmationView,ChangePasswordView,ChangeEmailView,ProfileImageUploadView
+from users.views import ProfileImageRetrieveView, RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView,PasswordResetRequestView, PasswordResetConfirmationView,ChangePasswordView,ChangeEmailView,ProfileImageUploadView
 from rest_framework.routers import DefaultRouter
 from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,AnalyticsView,IncomeOverviewView,IncomeTransactionsView,ExpenseTransactionsView,ExpenseOverviewView,IncomeandExpenseProgressView,EditCategoryView,DeleteCategoryView
 
@@ -41,7 +41,9 @@ urlpatterns = [
     path('api/password-reset/confirm/', PasswordResetConfirmationView.as_view(), name='password_reset_confirm'),
     path('api/change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('api/profile/change-email/', ChangeEmailView.as_view(), name='change_email'),
-     path('api/upload-profile-image/', ProfileImageUploadView.as_view(), name='upload-profile-image'),
+    path('api/upload-profile-image/', ProfileImageUploadView.as_view(), name='upload-profile-image'),
+    path('api/profile/image/', ProfileImageRetrieveView.as_view(), name='profile-image-retrieve'),
+
     path("api/transactions/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
     path("api/transactions/<int:pk>/", TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
     path('api/dashboard/total-income/<int:month>', TotalIncomeView.as_view(), name='total-income'),

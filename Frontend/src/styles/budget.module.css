@@ -26,7 +26,7 @@
 .name{
 
      padding: 15px;
-     font-size: 25px;
+     font-size: 22px;
      font-weight: 700;
 }
 
@@ -56,6 +56,13 @@
     border-radius: 10px;
     
 }
+.BudgetFirst.selected {
+    background-color: #2f2cd8; /* Blue color for selected item */
+    color: white;
+  }
+  .BudgetName.selected {
+    color: #fff;
+  }
 .Add{
     display: flex;
     align-items: center;

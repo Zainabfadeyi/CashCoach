@@ -35,7 +35,6 @@ const TanStackTable = () => {
     }
     return color;
   };
-
   const getColorForCategory = (category) => {
     if (!categoryColors[category]) {
       const newColor = generateRandomColor();
@@ -47,6 +46,8 @@ const TanStackTable = () => {
     }
     return categoryColors[category];
   };
+
+
   const columnHelper = createColumnHelper();
 
 const columns = [
@@ -73,6 +74,7 @@ const columns = [
     cell: (info) => {
       const category = info.getValue();
       const color = getColorForCategory(category);
+      
       return (
         <span
           className={styles.categoryCell}
@@ -101,6 +103,7 @@ const columns = [
 
 const [data, setData] = useState([]);
 const [globalFilter, setGlobalFilter] = useState("");
+
 
 
   const getData = async () => {

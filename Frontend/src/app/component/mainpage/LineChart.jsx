@@ -58,7 +58,6 @@ const LineChart = () => {
     <div className={styles.LineChart}>
       <div>
         <div style={{fontSize: "22px", fontWeight: "600", color:"#1F2C73"}}>Balance Trends</div>
-        {/* Dynamically replace the static number with totalIncome */}
         <div style={{fontSize: "30px", fontWeight: "700", color:"#1F2C73"}}>₦ {totalIncome.toLocaleString()}</div>
       </div>
       

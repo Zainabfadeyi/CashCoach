@@ -185,3 +185,18 @@ class ProfileImageUploadView(APIView):
                 "image_url": user.image.url  # Return the image URL in response
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ProfileImageRetrieveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.image:  # Check if the user has an image
+            image_url = user.image.url
+            return Response({
+                "message": "Profile image retrieved successfully!",
+                "image_url": image_url  # Return the image URL
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({
+                "message": "No profile image found for this user.",
+            }, status=status.HTTP_404_NOT_FOUND)

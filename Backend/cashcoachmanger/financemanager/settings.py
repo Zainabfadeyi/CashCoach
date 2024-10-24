@@ -179,8 +179,8 @@ DEFAULT_FROM_EMAIL = 'your-email@zoho.com'
 # Allow all hosts
 ALLOWED_HOSTS = ['*']
 CORS_ALLOWED_ORIGINS = [
-    "https://cash-coach.vercel.app",  # Allow requests from this origin
-#    "http://localhost:3000"
+    # "https://cash-coach.vercel.app",  # Allow requests from this origin
+   "http://localhost:3000"
 ]
 CORS_ALLOW_CREDENTIALS = True
 
