@@ -35,26 +35,27 @@ class CategoryViewSet(CustomViewSet):
         return AllCategory.objects.filter(user=self.request.user)
 
 class IncomeByCategoryView(APIView):
-    def get(self, request):
-        # Fetch income transactions grouped by category
+    
+    def get(self, request, user_id):
+        # Fetch income transactions grouped by category for the specific user
         income_data = (
             Transaction.objects
-            .filter(category_type='Income')  # Filter by income
+            .filter(category_type='Income', user_id=user_id)  # Filter by income and user ID from URL
             .values('category')  # Group by category name
             .distinct()  # Get unique category names
         )
-
+        
         # Prepare the response
         categories = [item['category'] for item in income_data]
 
         return Response(categories, status=200)
     
 class ExpenseByCategoryView(APIView):
-     def get(self, request):
+     def get(self, request,user_id):
         # Fetch expense transactions grouped by category
         expense_data = (
             Transaction.objects
-            .filter(category_type='Expenses')  # Filter by expenses
+            .filter(category_type='Expenses',user_id=user_id)  # Filter by expenses
             .values('category')  # Group by category name
             .distinct()  # Get unique category names
         )
@@ -67,7 +68,7 @@ class ExpenseByCategoryView(APIView):
 
 
 class MonthlyExpenseCategoryView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         #  current month and year
         current_month = datetime.now().month
         current_year = datetime.now().year
@@ -75,14 +76,14 @@ class MonthlyExpenseCategoryView(APIView):
         #  total expenses for the current month
         total_expenses = (
             Transaction.objects
-            .filter(category_type='Expenses', transaction_date__month=current_month, transaction_date__year=current_year)
+            .filter(category_type='Expenses',user_id=user_id, transaction_date__month=current_month, transaction_date__year=current_year)
             .aggregate(total=Sum('amount'))['total'] or 0  #  total sum of expenses for the month
         )
 
         # Fetch expenses by category for the current month, grouped by category
         expense_data = (
             Transaction.objects
-            .filter(category_type='Expenses', transaction_date__month=current_month, transaction_date__year=current_year)
+            .filter(category_type='Expenses',user_id=user_id, transaction_date__month=current_month, transaction_date__year=current_year)
             .values('category')  # Group by category name
             .annotate(total_amount=Sum('amount'))  # Total amount per category
             .order_by('-total_amount')  # Order by total amount (descending)
@@ -107,14 +108,14 @@ class IncomeViewSet(CustomViewSet):
         return Income.objects.filter(user=self.request.user)
 
 class DailyIncomeTrendView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         today = datetime.now().date()
         start_date = today - timedelta(days=11)  # 12 days total
 
         # Fetch income transactions for the last 12 days, grouped by transaction_date
         income_data = (
             Transaction.objects
-            .filter(category_type='Income', transaction_date__gte=start_date, user=request.user)
+            .filter(category_type='Income', user_id=user_id,transaction_date__gte=start_date, user=request.user)
             .values('transaction_date')  # Group by transaction_date
             .annotate(total_income=Sum('amount'))  # Sum amounts for each date
             .order_by('transaction_date')  # Order by transaction_date
@@ -149,13 +150,14 @@ class DailyIncomeTrendView(APIView):
         return Response(response_data, status=200)
 class TotalExpensesView(APIView):
 
-    def get(self, request, month, year=None, *args, **kwargs):
+    def get(self,request, user_id, month, year=None, *args, **kwargs):
         if not year:
             year = datetime.now().year  # Default to current year if not provided
 
         # Calculate the total sum of all expense transactions for the specified month and year
         total_expenses = Transaction.objects.filter(
             category_type='Expenses',
+            user_id=user_id,
             transaction_date__month=month,
             transaction_date__year=year
         ).aggregate(total_expenses=Sum('amount'))['total_expenses'] or 0
@@ -164,13 +166,14 @@ class TotalExpensesView(APIView):
         return Response({'total_expenses': float(total_expenses)})
 class TotalIncomeView(APIView):
     
-    def get(self, request, month, *args, **kwargs):
+    def get(self, request,user_id, month, *args, **kwargs):
         # Get the current year or the specified year if you want to filter by year
         year = datetime.now().year
 
         # Aggregate the sum of all income transactions for the specified month
         total_income = Transaction.objects.filter(
             category_type='Income',
+            user_id=user_id,
             transaction_date__month=month,
             transaction_date__year=year  # Optionally filter by year
         ).aggregate(total_income=Sum('amount'))['total_income'] or 0
@@ -191,7 +194,7 @@ class ExpenseViewSet(CustomViewSet):
 class ExpensesBreakdownView(APIView):
     queryset = ExpenseCategory.objects.all()
     serializer_class = ExpensesBreakdonwnSerializer
-    def get(self, request):
+    def get(self, request,user_id):
         # Calculate the total expenses
         total_expenses = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
 
@@ -202,7 +205,7 @@ class ExpensesBreakdownView(APIView):
         category_data = []
         for category in categories:
             # Calculate the total amount spent in this category
-            category_total = ExpenseCategory.objects.filter(category=category).aggregate(total=Sum('amount'))['total'] or 0
+            category_total = ExpenseCategory.objects.filter(category=category,user_id=user_id).aggregate(total=Sum('amount'))['total'] or 0
             
             # Calculate the percentage
             percentage = (category_total / total_expenses * 100) if total_expenses > 0 else 0
@@ -220,33 +223,42 @@ class BudgetViewSet(CustomViewSet):
     
 
     def get_queryset(self):
-        # Return all budgets for the authenticated user
-        return Budget.objects.filter(user=self.request.user)
+      
+        user_id = self.kwargs.get('user_id')
+       
+        return Budget.objects.filter(user_id=user_id)
 
     def perform_create(self, serializer):
         # Set the user when creating a new budget
         serializer.save(user=self.request.user)
 class   DeleteBudgetView(APIView): 
-    def delete(self, request, budget_id=None):
+    def delete(self, request,user_id, budget_id=None):
         try:
             # Fetch the budget by its ID
-            budget = Budget.objects.get(id=budget_id)
+            budget = Budget.objects.get(id=budget_id,user_id=user_id)
             budget.delete()  # Delete the budget
             return Response({"detail": "Budget deleted successfully."}, status=200)
         except Budget.DoesNotExist:
             return Response({"detail": "Budget not found."})
     
 class BudgetListView(generics.ListAPIView):
-    queryset = Budget.objects.all()  
+   
     serializer_class = BudgetListSerializer
     
+ 
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return Budget.objects.filter(user_id=user_id)
+    
 class BudgetDetailView(generics.RetrieveAPIView):
-    queryset = Budget.objects.all()
+ 
     serializer_class = BudgetDetailSerializer
     
     lookup_field = 'name'
 
-    def get_object(self):
+    def get_object(self,user_id):
+        user_id = self.kwargs.get('user_id')
+
         name = self.kwargs.get('name')
         try:
             return Budget.objects.get(name=name)
@@ -256,32 +268,35 @@ class BudgetDetailView(generics.RetrieveAPIView):
 class BudgetProgressAPIView(generics.RetrieveAPIView):
     serializer_class = BudgetProgressSerializer
     permission_classes = [IsAuthenticated]
-    queryset = Budget.objects.all()
+    
     lookup_field = 'pk' 
   
     
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        return Budget.objects.filter(user_id=user_id)
         
             
 class BudgetDashboardView(generics.ListAPIView):
     queryset = Budget.objects.all()
     serializer_class = BudgetDashboardSerializer
-    def get_queryset(self):
-        # Annotate budgets with their percentage spent
-        total_amount_spent = Budget.objects.aggregate(total_spent=Sum('amount_spent'))['total_spent'] or 0
 
-        # If total_amount_spent is zero, we won't perform the percentage calculation
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id') 
+        total_amount_spent = Budget.objects.filter(user_id=user_id).aggregate(total_spent=Sum('amount_spent'))['total_spent'] or 0
+
+        # Filter budgets by user and calculate the percentage spent
         if total_amount_spent > 0:
-            return Budget.objects.annotate(
-                percentage_spent=(Sum('amount_spent') / total_amount_spent) * 100
+            return Budget.objects.filter(user_id=user_id).annotate(
+                percentage_spent=(F('amount_spent') / total_amount_spent) * 100
             ).order_by('-percentage_spent')  # Order by percentage_spent descending
         else:
-            return Budget.objects.all().order_by('name') 
-
+            return Budget.objects.filter(user_id=user_id).order_by('name')
 
 class WeeklySpendingChartView(generics.GenericAPIView):
     serializer_class = BudgetWeeklySpendingSerializer
 
-    def get(self, request, budget_id, *args, **kwargs):
+    def get(self, request,user_id, budget_id, *args, **kwargs):
         today = datetime.now().date()
         # Get data for the last 12 days
         start_date = today - timedelta(days=11)  # This includes today + 11 previous days
@@ -295,6 +310,7 @@ class WeeklySpendingChartView(generics.GenericAPIView):
                 transaction_date__gte=day,
                 transaction_date__lt=day + timedelta(days=1),
                 category_type='Expenses',
+                user_id=user_id,
                 budget__id=budget_id  # Use budget__id instead of budget_id
             ).aggregate(total=Sum('amount'))['total'] or 0
             
@@ -308,7 +324,7 @@ class WeeklySpendingChartView(generics.GenericAPIView):
     
 class MonthlyIncomeExpenseView(APIView):
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request,user_id, *args, **kwargs):
         monthly_data = {}
 
         # Get today's date and start from the current month
@@ -326,12 +342,14 @@ class MonthlyIncomeExpenseView(APIView):
             # Query total income for this month
             monthly_income = Transaction.objects.filter(
                 category_type='Income', 
+                user_id=user_id,
                 transaction_date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_income=Sum('amount'))['total_income'] or 0
 
             # Query total expenses for this month
             monthly_expense = Transaction.objects.filter(
                 category_type='Expenses', 
+                user_id=user_id,
                 transaction_date__range=[first_day_of_month, last_day_of_month]
             ).aggregate(total_expense=Sum('amount'))['total_expense'] or 0
 
@@ -375,38 +393,46 @@ class TransactionViewSet(CustomViewSet):
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
-    def delete(self, request, *args, **kwargs):
-        
+    def delete(self, request,user_id, *args, **kwargs):
         pk = kwargs.get('pk')  # Get the pk from URL
-        transaction = self.get_object()  # Retrieve the object based on pk
-        transaction.delete()  # Perform the delete action
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+           
+            transaction = Transaction.objects.get(pk=pk, user_id=user_id)
+            transaction.delete()  # Perform the delete action
+            return Response(status=204)
+        except Transaction.DoesNotExist:
+            return Response({"detail":"Transaction not found"},status=200)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, user_id, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+        
+        # Ensure the user_id matches the user associated with the instance
+        if instance.user_id != user_id:
+            return Response({"detail": "You do not have permission to update this budget."}, status=status.HTTP_403_FORBIDDEN)
+
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        return Response(serializer.data,status=201)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
 
 class AnalyticsView(APIView):
     
-    def get(self, request, *args, **kwargs):
-        user = request.user
+    def get(self, request,user_id, *args, **kwargs):
+       
         today = datetime.now().date()
   
         # Total income and expenses for the that day
         total_income_today = Transaction.objects.filter(
-            user=user, 
             category_type='Income', 
+            user_id=user_id,
             transaction_date=today
         ).aggregate(total=Sum('amount'))['total'] or 0
 
         total_expense_today = Transaction.objects.filter(
-            user=user, 
             category_type='Expenses', 
+            user_id=user_id,
             transaction_date=today
         ).aggregate(total=Sum('amount'))['total'] or 0
 
@@ -415,10 +441,10 @@ class AnalyticsView(APIView):
         daily_average = total_today / 2 if total_today > 0 else 0
 
         # Total number of categories and transactions
-        total_transactions = Transaction.objects.count()
+        total_transactions = Transaction.objects.filter(user_id=user_id).count()
 
     # Total Categories
-        total_categories = AllCategory.objects.count()
+        total_categories = AllCategory.objects.filter(user_id=user_id).count()
 
         # Prepare the response data
         analytics_data = {
@@ -431,7 +457,7 @@ class AnalyticsView(APIView):
 
 
 class IncomeOverviewView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         # Get the current date and the first day of the current month
         today = now()
         first_day_of_month = today.replace(day=1)
@@ -441,6 +467,7 @@ class IncomeOverviewView(APIView):
             Transaction.objects.filter(
                 created_at__gte=first_day_of_month,
                 category_type='Income',
+                user_id=user_id,
                 user=request.user  # Filter by logged-in user
             )
             .values('category')
@@ -468,7 +495,7 @@ class IncomeOverviewView(APIView):
 
 
 class ExpenseOverviewView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         # Get the current date and the first day of the current month
         today = now()
         first_day_of_month = datetime.now().replace(day=1)
@@ -477,8 +504,9 @@ class ExpenseOverviewView(APIView):
         expense_transactions = (
             Transaction.objects.filter(
                 created_at__gte=first_day_of_month,
-                category_type='Expenses',  # Filter by expense transactions
-                user=request.user  # Assuming you want to filter by the logged-in user
+                category_type='Expenses',
+                user_id=user_id,
+                user=request.user  
             )
             .values('category')
             .annotate(total_amount=Sum('amount'))  # Group by category and sum the amounts
@@ -503,9 +531,9 @@ class ExpenseOverviewView(APIView):
 
 
 class IncomeTransactionsView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         # Fetch all transactions where category_type is 'Expenses'
-        transactions = Transaction.objects.filter(category_type='Income')
+        transactions = Transaction.objects.filter(category_type='Income',user_id=user_id)
 
         # Prepare the response data
         transactions_data = [
@@ -528,9 +556,9 @@ class IncomeTransactionsView(APIView):
 
 
 class ExpenseTransactionsView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         # Fetch all transactions where category_type is 'Expenses'
-        transactions = Transaction.objects.filter(category_type='Expenses')
+        transactions = Transaction.objects.filter(category_type='Expenses',user_id=user_id)
 
         # Prepare the response data
         transactions_data = [
@@ -550,10 +578,10 @@ class ExpenseTransactionsView(APIView):
         return Response(transactions_data, status=200)
     
 class IncomeandExpenseProgressView(APIView):
-    def get(self, request):
+    def get(self, request,user_id):
         # Fetch total income and income transaction count
         income_data = Transaction.objects.filter(
-            user=request.user, category_type='Income'
+            user=request.user, category_type='Income',user_id=user_id
         ).aggregate(
             total_income=Sum('amount'),
             total_income_count=Count('id')
@@ -561,7 +589,7 @@ class IncomeandExpenseProgressView(APIView):
 
         # Fetch total expenses
         expense_data = Transaction.objects.filter(
-            user=request.user, category_type='Expenses'
+            user=request.user, category_type='Expenses',user_id=user_id
         ).aggregate(
             total_expenses=Sum('amount'),
             total_expenses_count=Count('id')
@@ -591,7 +619,7 @@ class EditCategoryView(generics.UpdateAPIView):
     queryset = AllCategory.objects.all()
     serializer_class = CategorySerializer
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request,user_id, *args, **kwargs):
         category = self.get_object()  
         # Get the category to be updated
         old_name = category.name 
@@ -601,7 +629,7 @@ class EditCategoryView(generics.UpdateAPIView):
         response = super().update(request, *args, **kwargs)
 
         # Update all transactions that used the old category name
-        Transaction.objects.filter(category=old_name).update(category=request.data['name'])
+        Transaction.objects.filter(category=old_name,user_id=user_id).update(category=request.data['name'])
 
         return response
     
@@ -609,11 +637,11 @@ class EditCategoryView(generics.UpdateAPIView):
 class DeleteCategoryView(generics.DestroyAPIView):
     queryset = AllCategory.objects.all()
 
-    def destroy(self, request, *args, **kwargs):
+    def destroy(self, request,user_id, *args, **kwargs):
         category = self.get_object()  # Get the category to be deleted
 
         # Delete all transactions associated with this category
-        Transaction.objects.filter(category=category.name).delete()
+        Transaction.objects.filter(category=category.name,user_id=user_id).delete()
 
         # Perform the category deletion
         category.delete()

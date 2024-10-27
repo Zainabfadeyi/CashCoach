@@ -20,7 +20,7 @@ from django.urls import path, include
 from django.contrib import admin
 from users.views import ProfileImageRetrieveView, RegisterationViewSet,LoginViewSet,RefreshViewset, UserDetailsView,PasswordResetRequestView, PasswordResetConfirmationView,ChangePasswordView,ChangeEmailView,ProfileImageUploadView
 from rest_framework.routers import DefaultRouter
-from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDetailView,BudgetDashboardView, MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,AnalyticsView,IncomeOverviewView,IncomeTransactionsView,ExpenseTransactionsView,ExpenseOverviewView,IncomeandExpenseProgressView,EditCategoryView,DeleteCategoryView
+from finance.views import CategoryViewSet, BudgetViewSet, IncomeViewSet, ExpenseViewSet,TransactionViewSet,BudgetDashboardView,MonthlyIncomeExpenseView,TotalIncomeView,TotalExpensesView,DailyIncomeTrendView,BudgetListView,WeeklySpendingChartView,IncomeByCategoryView,ExpenseByCategoryView,MonthlyExpenseCategoryView,DeleteBudgetView,BudgetProgressAPIView,AnalyticsView,IncomeOverviewView,IncomeTransactionsView,ExpenseTransactionsView,ExpenseOverviewView,IncomeandExpenseProgressView,EditCategoryView,DeleteCategoryView
 
 router = DefaultRouter()
 router.register(r'auth/register', RegisterationViewSet,basename='auth-register')
@@ -44,31 +44,31 @@ urlpatterns = [
     path('api/upload-profile-image/', ProfileImageUploadView.as_view(), name='upload-profile-image'),
     path('api/profile/image/', ProfileImageRetrieveView.as_view(), name='profile-image-retrieve'),
 
-    path("api/transactions/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
-    path("api/transactions/<int:pk>/", TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
-    path('api/dashboard/total-income/<int:month>', TotalIncomeView.as_view(), name='total-income'),
-    path('api/dashboard/total-expenses/<int:month>', TotalExpensesView.as_view(), name='total-expenses'),
-    path('api/dashboard/daily-income-trend/', DailyIncomeTrendView.as_view(), name='daily-income-trend'),
-    path('api/expenses-by-category/', ExpenseByCategoryView.as_view(), name='expenses-by-category'),
-    path('api/income-by-category/', IncomeByCategoryView.as_view(), name='income-by-category'),
-    path('api/dashboard/monthly-expense-breakdown/', MonthlyExpenseCategoryView.as_view(), name='expense-category-list'),
-    path('api/dashboard/budget-summary', BudgetDashboardView.as_view(), name='budget-summary'),
-    path('api/dashboard/monthly-income-expense/', MonthlyIncomeExpenseView.as_view(), name='monthly-income-expense'),
+    path("api/transactions/<int:user_id>/", TransactionViewSet.as_view({'get': 'list', 'post': 'create'}), name='user-transactions'),
+    path("api/transactions/<int:user_id>/<int:pk>/", TransactionViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'}), name='transaction-detail'),
+    path('api/dashboard/total-income/<int:user_id>/<int:month>/', TotalIncomeView.as_view(), name='total-income'),
+    path('api/dashboard/total-expenses/<int:users_id>/<int:month>/', TotalExpensesView.as_view(), name='total-expenses'),
+    path('api/dashboard/daily-income-trend/<int:user_id>/', DailyIncomeTrendView.as_view(), name='daily-income-trend'),
+    path('api/expenses-by-category/<int:user_id>/', ExpenseByCategoryView.as_view(), name='expenses-by-category'),
+    path('api/income-by-category/<int:user_id>/', IncomeByCategoryView.as_view(), name='income-by-category'),
+    path('api/dashboard/monthly-expense-breakdown/<int:user_id>/', MonthlyExpenseCategoryView.as_view(), name='expense-category-list'),
+    path('api/dashboard/budget-summary/<int:user_id>/', BudgetDashboardView.as_view(), name='budget-summary'),
+    path('api/dashboard/monthly-income-expense/<int:user_id>/', MonthlyIncomeExpenseView.as_view(), name='monthly-income-expense'),
     # path('api/transactions/', TransactionViewSet.as_view(), name='transaction-list'),
-    path('api/sidebar/budgets-with-totalamount/', BudgetListView.as_view(), name='budget-list'),
-    path('api/budget/<int:pk>/progress/', BudgetProgressAPIView.as_view(), name='budget-progress'),
-    path('api/budget/<str:name>/', BudgetDetailView.as_view(), name='budget-detail'),
-    path('api/delete-budget/<int:budget_id>/', DeleteBudgetView.as_view(), name='delete-budget'),
-    path('api/sidebar/budgets/<int:budget_id>/spending-chart/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart'),
-    path('api/categories/edit/<int:pk>/', EditCategoryView.as_view(), name='edit_category'),
-    path('api/categories/delete/<int:pk>/', DeleteCategoryView.as_view(), name='delete_category'),
+    path('api/sidebar/budgets-with-totalamount/<int:user_id>/', BudgetListView.as_view(), name='budget-list'),
+    path('api/budget/<int:user_id>/<int:pk>/progress/', BudgetProgressAPIView.as_view(), name='budget-progress'),
+    path('api/budget/<int:user_id>/', BudgetViewSet.as_view({'get': 'list', 'post': 'create'}), name='budget-detail'),
+    path('api/delete-budget/<int:user_id>/<int:budget_id>/', DeleteBudgetView.as_view(), name='delete-budget'),
+    path('api/sidebar/budgets/<int:user_id>/<int:budget_id>/spending-chart/', WeeklySpendingChartView.as_view(), name='weekly-spending-chart'),
+    path('api/categories/edit/<int:user_id>/<int:pk>/', EditCategoryView.as_view(), name='edit_category'),
+    path('api/categories/delete/<int:user_id>/<int:pk>/', DeleteCategoryView.as_view(), name='delete_category'),
     # ANALYTICS PAGE
-    path('api/analytics/overview/', AnalyticsView.as_view(), name='analytics_overview'),
-    path('api/income-overview/', IncomeOverviewView.as_view(), name='income_overview'),
-    path('api/expenses-overview/',ExpenseOverviewView.as_view(), name='expense_overview'),
-    path('api/income-expense-Progress/',IncomeandExpenseProgressView.as_view(), name='expense_overview'),
-   path('api/income-transactions/', IncomeTransactionsView.as_view(), name='income_transactions'),
-   path('api/expenses-transactions/', ExpenseTransactionsView.as_view(), name='expense_transactions'),
+    path('api/analytics-overview/<int:user_id>/', AnalyticsView.as_view(), name='analytics_overview'),
+    path('api/income-overview/<int:user_id>/', IncomeOverviewView.as_view(), name='income_overview'),
+    path('api/expenses-overview/<int:user_id>/',ExpenseOverviewView.as_view(), name='expense_overview'),
+    path('api/income-expense-Progress/<int:user_id>/',IncomeandExpenseProgressView.as_view(), name='expense_overview'),
+   path('api/income-transactions/<int:user_id>/', IncomeTransactionsView.as_view(), name='income_transactions'),
+   path('api/expenses-transactions/<int:user_id>/', ExpenseTransactionsView.as_view(), name='expense_transactions'),
 
 ]
 
