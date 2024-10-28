@@ -20,12 +20,13 @@ const BudgetLineChart =  ({ budgetId })  => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   // Fetch the API data
   useEffect(() => {
     const fetchTransactions = async () => {
       console.log('Fetching transactions for budgetId:', budgetId);
       try {
-        const response = await axios.get(`sidebar/budgets/${budgetId}/spending-chart/`, {
+        const response = await axios.get(`sidebar/budgets/${userId}/${budgetId}/spending-chart/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

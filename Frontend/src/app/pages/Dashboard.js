@@ -18,6 +18,7 @@ const Dashboard = () => {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); 
   const [selectedIncomeMonth, setSelectedIncomeMonth] = useState(new Date().getMonth() + 1);// Month index (1-12)
   const [totalIncome, setTotalIncome] = useState(0);
@@ -40,7 +41,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/dashboard/total-expenses/${selectedMonth}`
+        const response = await axios.get(`/dashboard/total-expenses/${userId}/${selectedMonth}/`
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -63,7 +64,7 @@ const Dashboard = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get(`/dashboard/total-income/${selectedIncomeMonth}`
+        const response = await axios.get(`/dashboard/total-income/${userId}/${selectedIncomeMonth}/`
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,

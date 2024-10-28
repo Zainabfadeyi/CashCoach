@@ -21,12 +21,13 @@ const Budget = () => {
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);  // State for delete modal
   const [budgetToDelete, setBudgetToDelete] = useState(null);      
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
 
   // Fetch all budgets when component mounts
   useEffect(() => {
     const fetchBudgets = async () => {
       try {
-        const response = await axios.get('/budgets/', {
+        const response = await axios.get(`/budget/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -57,7 +58,7 @@ const Budget = () => {
   // Fetch budget details from the /progress endpoint
   const handleBudgetClick = async (budget) => {
     try {
-      const response = await axios.get(`budget/${budget.id}/progress/`, {
+      const response = await axios.get(`budget/${userId}/${budget.id}/progress/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -69,7 +70,7 @@ const Budget = () => {
   };
   const handleDeleteBudget = async () => {
     try {
-      await axios.delete(`/delete-budget/${budgetToDelete.id}/`, {
+      await axios.delete(`/delete-budget/${userId}/${budgetToDelete.id}/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

@@ -7,11 +7,12 @@ import { useSelector } from '../../../api/hook';
 
 const Progress = () => {
   const [budgetData, setBudgetData] = useState([]); 
-  const accessToken = useSelector((state) => state.auth.accessToken); 
+  const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id); 
   // Function to fetch budget summary from API
   const fetchBudgetSummary = async () => {
     try {
-      const response = await axios.get('/dashboard/budget-summary',
+      const response = await axios.get(`/dashboard/budget-summary/${userId}/`,
         {
         headers: {
           Authorization: `Bearer ${accessToken}`,

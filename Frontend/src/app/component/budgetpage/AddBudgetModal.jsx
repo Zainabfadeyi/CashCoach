@@ -10,6 +10,7 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -22,7 +23,7 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
     };
 
     try {
-      const response = await axios.post('/budgets/', newBudget
+      const response = await axios.post(`/budgets/${userId}/`, newBudget
         , {
           headers: {
             Authorization: `Bearer ${accessToken}`,

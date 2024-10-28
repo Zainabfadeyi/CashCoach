@@ -8,12 +8,12 @@ const LineChart = () => {
   const [dailyIncomeTrend, setDailyIncomeTrend] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0); // State for total income
   const accessToken = useSelector((state) => state.auth.accessToken); // Get access token
-
+  const userId = useSelector((state) => state.auth.user.user.id);
   useEffect(() => {
     // Fetch data from the API
     const fetchData = async () => {
       try {
-        const response = await axios.get('/dashboard/daily-income-trend/', {
+        const response = await axios.get(`/dashboard/daily-income-trend/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

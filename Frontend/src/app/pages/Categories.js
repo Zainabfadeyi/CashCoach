@@ -17,6 +17,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const closeModal = () => setIsModalOpen(false);
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   // Define separate color arrays for income and expense categories
   const incomeColors = ['#FFB6C1', '#FF1493', '#FFFF00', '#DB7093',  '#AFEEEE','#FF7F50', '#00BFFF', '#FFE4B5','#FF4500', '#FFD700', '#FFA07A','#4682B4',  '#FFDAB9', '#FFDEAD', '#F0E68C'];
   const expenseColors = [
@@ -43,7 +44,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   }, [accessToken]);
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('categories/'
+      const response = await axios.get(`categories/${userId}/`
       , {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -80,7 +81,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const handleUpdateCategory = async (updatedCategory) => {
     try {
-      const response = await axios.put(`categories/${editCategory.id}/`, updatedCategory, {
+      const response = await axios.put(`categories/${userId}/${editCategory.id}/`, updatedCategory, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -115,7 +116,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   
   const handleConfirmDeleteCategory = async () => {
     try {
-      await axios.delete(`categories/delete/${selectedCategoryId.id}/`, {
+      await axios.delete(`categories/delete/${userId}/${selectedCategoryId.id}/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

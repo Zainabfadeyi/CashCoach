@@ -8,7 +8,7 @@ export const useFetchTransactions = () => {
 
   const analyticsTransactions = async () => {
     try {
-      const apiUrl = `dashboard/monthly-income-expense/`;
+      const apiUrl = `dashboard/monthly-income-expense/${userId}/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -24,7 +24,7 @@ export const useFetchTransactions = () => {
 
   const fetchTransactions = async () => {
     try {
-      const apiUrl = `income-transactions/`;
+      const apiUrl = `income-transactions/${userId}/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -39,7 +39,7 @@ export const useFetchTransactions = () => {
   };
   const fetchExpTransactions = async () => {
     try {
-      const apiUrl = `expenses-transactions/`;
+      const apiUrl = `expenses-transactions/${userId}/`;
       const response = await axios.get(apiUrl, {
         headers: {
           Authorization: `Bearer ${accessToken}`,

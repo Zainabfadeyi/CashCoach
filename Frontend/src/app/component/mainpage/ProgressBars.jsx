@@ -10,11 +10,12 @@ const ProgressBars = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const accessToken = useSelector((state) => state.auth.accessToken);
 
+  const userId = useSelector((state) => state.auth.user.user.id);
   const colorPalette = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#007bff', '#6c757d', '#343a40', '#8e44ad', '#e74c3c', '#f39c12'];
 
   useEffect(() => {
-    // Fetch data from the API
-    axios.get('/dashboard/monthly-expense-breakdown/', {
+
+    axios.get(`/dashboard/monthly-expense-breakdown/${userId}/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
