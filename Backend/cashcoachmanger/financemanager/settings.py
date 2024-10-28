@@ -168,13 +168,6 @@ SIMPLE_JWT = {
     # You can add more SIMPLE_JWT se
     # ttings as needed
 }
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.zoho.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'your-email@zoho.com'
-EMAIL_HOST_PASSWORD = 'your-password'
-DEFAULT_FROM_EMAIL = 'your-email@zoho.com'
 
 # Allow all hosts
 ALLOWED_HOSTS = ['*']
