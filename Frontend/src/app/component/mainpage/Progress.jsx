@@ -26,7 +26,7 @@ const Progress = () => {
 
   useEffect(() => {
     fetchBudgetSummary();
-  }, []);
+  }, [fetchBudgetSummary]);
 
   return (
     <div className={styles.progress}>

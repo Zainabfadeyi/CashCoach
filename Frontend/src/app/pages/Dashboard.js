@@ -36,7 +36,7 @@ const Dashboard = () => {
     setSelectedIncomeMonth(monthIndex);
   };
 
-  useEffect(() => {
+ 
     const fetchTotals = async () => {
       setLoading(true);
       setError(null);
@@ -56,11 +56,13 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
+     useEffect(() => {
 
     fetchTotals();
   }, [selectedMonth]);
-  useEffect(() => {
-    const fetchTotals = async () => {
+
+  
+    const fetchIncTotals = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -78,8 +80,9 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
+    useEffect(() => {
 
-    fetchTotals();
+    fetchIncTotals();
   }, [selectedIncomeMonth]);
 
 
@@ -87,6 +90,8 @@ const Dashboard = () => {
 
   const handleAddExpense = async (expenseData) => {
     try {
+      fetchIncTotals()
+      fetchTotals()
       
     } catch (error) {
       console.error('Failed to add transaction:', error);

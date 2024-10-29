@@ -54,13 +54,14 @@ const ProgressBars = () => {
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Track loading state
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
 
   // Fetch progress data (income/expenses percentages)
   useEffect(() => {
     const fetchProgressData = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('income-expense-Progress/', {
+        const response = await axios.get(`income-expense-Progress/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -88,7 +89,7 @@ const ProgressBars = () => {
     const fetchTransactions = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('expenses-overview/', {
+        const response = await axios.get(`expenses-overview/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

@@ -28,11 +28,25 @@ class CustomViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class CategoryViewSet(CustomViewSet):
+# class CategoryViewSet(CustomViewSet):
+#     serializer_class = CategorySerializer
+
+#     def get_queryset(self):
+#         return AllCategory.objects.filter(user=self.request.user)
+class CategoryViewSet(viewsets.ModelViewSet):
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return AllCategory.objects.filter(user=self.request.user)
+        
+        user = self.request.user
+        queryset = AllCategory.objects.filter(user=user)
+        
+        return queryset
+
+    def perform_create(self, serializer):
+       
+        serializer.save(user=self.request.user)
 
 class IncomeByCategoryView(APIView):
     
@@ -364,33 +378,82 @@ class MonthlyIncomeExpenseView(APIView):
 
         return Response(monthly_data)
     
+# class TransactionViewSet(CustomViewSet):
+#     lookup_field = 'pk' 
+#     permission_classes = [IsAuthenticated]
+#     queryset = Transaction.objects.all()
+#     serializer_class = TransactionSerializer
+#     def list(self, request):
+#         user_id = request.query_params.get('user_id')
+#         if user_id:
+#              # Filter by user ID if provided
+            
+#             transactions = Transaction.objects.filter(user_id=user_id)
+#         else:
+#              # Default to the authenticated user
+#             transactions = Transaction.objects.filter(user=request.user)
+        
+#         serializer = TransactionSerializer(transactions, many=True)
+#         return Response(serializer.data)
+
+#     def create(self, request):
+#         user_id = request.query_params.get('user_id')
+#         if not user_id:
+#             return Response({"error": "User ID is required."}, status=400)
+
+#         serializer = TransactionSerializer(data=request.data)
+#         if serializer.is_valid():
+#             transaction = serializer.save(user_id=user_id)
+#             return Response(serializer.data, status=201)
+#         return Response(serializer.errors, status=400)
+
+#     def delete(self, request,user_id, *args, **kwargs):
+#         pk = kwargs.get('pk')  # Get the pk from URL
+#         try:
+           
+#             transaction = Transaction.objects.get(pk=pk, user_id=user_id)
+#             transaction.delete()  # Perform the delete action
+#             return Response(status=204)
+#         except Transaction.DoesNotExist:
+#             return Response({"detail":"Transaction not found"},status=200)
+
+#     def update(self, request, user_id, *args, **kwargs):
+#         partial = kwargs.pop('partial', False)
+#         instance = self.get_object()
+        
+#         # Ensure the user_id matches the user associated with the instance
+#         if instance.user_id != user_id:
+#             return Response({"detail": "You do not have permission to update this budget."}, status=status.HTTP_403_FORBIDDEN)
+
+#         serializer = self.get_serializer(instance, data=request.data, partial=partial)
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_update(serializer)
+#         return Response(serializer.data, status=status.HTTP_200_OK)
+    
 class TransactionViewSet(CustomViewSet):
     lookup_field = 'pk' 
     permission_classes = [IsAuthenticated]
     queryset = Transaction.objects.all()
     serializer_class = TransactionSerializer
-    def list(self, request):
-        user_id = request.query_params.get('user_id')
-        if user_id:
-             # Filter by user ID if provided
-            
-            transactions = Transaction.objects.filter(user_id=user_id)
-        else:
-             # Default to the authenticated user
-            transactions = Transaction.objects.filter(user=request.user)
+    def get_queryset(self):
+        # Ensure only categories for the logged-in user are returned
+        user = self.request.user
+        queryset = Transaction.objects.filter(user=user)
         
-        serializer = TransactionSerializer(transactions, many=True)
-        return Response(serializer.data)
+        return queryset
+
 
     def create(self, request):
-        user_id = request.query_params.get('user_id')
-        if not user_id:
-            return Response({"error": "User ID is required."}, status=400)
-
+    # Use the logged-in user directly
+        user = request.user
+        if not user.is_authenticated:
+            return Response({"error": "Authentication required."}, status=401)
         serializer = TransactionSerializer(data=request.data)
         if serializer.is_valid():
-            transaction = serializer.save(user_id=user_id)
+        # Save the transaction with the logged-in user
+            transaction = serializer.save(user=user)
             return Response(serializer.data, status=201)
+        
         return Response(serializer.errors, status=400)
 
     def delete(self, request,user_id, *args, **kwargs):
@@ -415,8 +478,6 @@ class TransactionViewSet(CustomViewSet):
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
 class AnalyticsView(APIView):
     
     def get(self, request,user_id, *args, **kwargs):

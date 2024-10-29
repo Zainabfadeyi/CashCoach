@@ -9,7 +9,7 @@ const LineChart = () => {
   const [totalIncome, setTotalIncome] = useState(0); // State for total income
   const accessToken = useSelector((state) => state.auth.accessToken); // Get access token
   const userId = useSelector((state) => state.auth.user.user.id);
-  useEffect(() => {
+
     // Fetch data from the API
     const fetchData = async () => {
       try {
@@ -36,9 +36,9 @@ const LineChart = () => {
         console.error('Error fetching daily income trend:', error);
       }
     };
-
+    useEffect(() => {
     fetchData();
-  }, [accessToken]);
+  }, [accessToken,fetchData]);
 
   // Format data for Nivo Line chart
   const formatDataForNivoLineChart = (data) => [

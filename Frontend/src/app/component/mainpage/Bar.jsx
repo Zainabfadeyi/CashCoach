@@ -27,7 +27,7 @@ const Bar = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   return (
     <div className={styles.barContainer}>

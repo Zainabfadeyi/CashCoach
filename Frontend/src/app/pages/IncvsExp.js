@@ -22,6 +22,7 @@ const IncvsExp = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   const [data, setData] = useState([]);
 
 
@@ -41,7 +42,7 @@ const IncvsExp = () => {
   useEffect(() => {
     const fetchOverviewData = async () => {
       try {
-        const response = await axios.get('analytics/overview/',
+        const response = await axios.get(`analytics-overview/${userId}/`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,

@@ -37,14 +37,10 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
     '#B22222', // Firebrick
     '#D2B48C'  // Tan
   ];
-  useEffect(() => {
-   
-
-    fetchCategories();
-  }, [accessToken]);
+  
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`categories/${userId}/`
+      const response = await axios.get(`categories/`
       , {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -55,6 +51,11 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
       console.error('Error fetching categories:', error);
     }
   };
+  useEffect(() => {
+   
+
+    fetchCategories();
+  }, [accessToken]);
 
   const handleAddCategory = async (newCategory) => {
     try {
@@ -158,7 +159,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
                   <LuEqual />
                 </div>
                 <div style={{ display: 'flex', width: '100%', alignItems: 'center', columnGap: '10px' }}>
-                  <div style={{ backgroundColor: getColor(index, 'income'), height: '32px', padding: '13px', borderRadius: '15px', marginTop: '7px' }}>
+                  <div style={{ backgroundColor: getColor(index, 'Income'), height: '32px', padding: '13px', borderRadius: '15px', marginTop: '7px' }}>
                     &nbsp;
                   </div>
                   <div className={styles.names}>
@@ -166,11 +167,11 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
                       {category.name}
                     </div>
                     <div className={styles.icon}>
-                      <div style={{ backgroundColor: '#E1E1F9', padding: '0px 10px 5px 10px', color: '#4C48DD' }} onClick={() => handleEditClick(category)}>
+                      <div style={{ backgroundColor: '#E1E1F9',fontSize:'18px',cursor:"pointer", padding: '0px 10px 5px 10px', color: '#4C48DD' }} onClick={() => handleEditClick(category)}>
                         <MdOutlineEdit />
                       </div>
                       <div
-                        style={{ backgroundColor: '#FCECEC', padding: '0px 10px 5px 10px', color: '#DC3C4C' }}
+                        style={{ backgroundColor: '#FCECEC', fontSize:'18px',cursor:"pointer",  padding: '0px 10px 5px 10px', color: '#DC3C4C' }}
                         onClick={() => handleDeleteCategoryClick(category.id)} // Show confirmation modal
                       >
                         <MdOutlineDelete />
@@ -194,7 +195,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
                   <LuEqual />
                 </div>
                 <div style={{ display: 'flex', width: '100%', alignItems: 'center', columnGap: '10px' }}>
-                  <div style={{ backgroundColor: getColor(index, 'expenses'), height: '32px', padding: '13px', borderRadius: '15px', marginTop: '7px' }}>
+                  <div style={{ backgroundColor: getColor(index, 'Expenses'), height: '32px', padding: '13px', borderRadius: '15px', marginTop: '7px' }}>
                     &nbsp;
                   </div>
                   <div className={styles.names}>
@@ -202,11 +203,11 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
                       {category.name}
                     </div>
                     <div className={styles.icon}>
-                      <div style={{ backgroundColor: '#E1E1F9', padding: '0px 10px 5px 10px', color: '#4C48DD' }} onClick={() => handleEditClick(category)}>
+                      <div style={{ backgroundColor: '#E1E1F9', fontSize:'18px',cursor:"pointer", padding: '0px 10px 5px 10px', color: '#4C48DD' }} onClick={() => handleEditClick(category)}>
                         <MdOutlineEdit />
                       </div>
                       <div
-                        style={{ backgroundColor: '#FCECEC', padding: '0px 10px 5px 10px', color: '#DC3C4C' }}
+                        style={{ backgroundColor: '#FCECEC', fontSize:'18px',cursor:"pointer",  padding: '0px 10px 5px 10px', color: '#DC3C4C' }}
                         onClick={() => handleDeleteCategoryClick(category.id)} // Show confirmation modal
                       >
                         <MdOutlineDelete />

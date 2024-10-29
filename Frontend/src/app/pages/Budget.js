@@ -22,27 +22,28 @@ const Budget = () => {
   const [budgetToDelete, setBudgetToDelete] = useState(null);      
   const accessToken = useSelector((state) => state.auth.accessToken);
   const userId = useSelector((state) => state.auth.user.user.id);
-
+  const [isFirstFetch, setIsFirstFetch] = useState(true); 
   // Fetch all budgets when component mounts
-  useEffect(() => {
-    const fetchBudgets = async () => {
-      try {
-        const response = await axios.get(`/budget/${userId}/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        setBudgets(response.data);
-        if (response.data.length > 0) {
-          handleBudgetClick(response.data[0]); // Automatically select the first budget and fetch its details
-        }
-      } catch (error) {
-        console.error('Error fetching budgets:', error);
+  const fetchBudgets = async () => {
+    try {
+      const response = await axios.get(`/budget/${userId}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setBudgets(response.data);
+      if (isFirstFetch && response.data.length > 0) {
+        handleBudgetClick(response.data[0]); // Automatically select the first budget on first fetch
+        setIsFirstFetch(false); // Update the flag to indicate that the first fetch has occurred
       }
-    };
+    } catch (error) {
+      console.error('Error fetching budgets:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchBudgets();
-  }, [accessToken]);
+  }, [fetchBudgets]); // Run fetchBudgets only once when the component mounts
     const handleAddBudget = (newBudget) => {
     const budget = {
       id: budgets.length + 1,
@@ -84,11 +85,11 @@ const Budget = () => {
     }
   };
 
-  if (!selectedBudget) {
-    return <div>
-      <LoadingSpinner  size={50} message="Processing..."/>
-    </div>;
-  }
+  // if (!selectedBudget) {
+  //   return <div>
+  //     <LoadingSpinner  size={50} message="Processing..."/>
+  //   </div>;
+  // }
 
   const getTimeLabel = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -206,7 +207,7 @@ const Budget = () => {
                     role="progressbar"
                     style={{
                       width: `${selectedBudget.spent_percentage}%`,
-                      backgroundColor: '#2F2CD8',
+                      backgroundColor: selectedBudget.spent_percentage > 100 ? '#ff0000' : '#2F2CD8', // Red if spent_percentage > 100, otherwise default color
                       borderRadius: '15px',
                     }}
                   ></div>

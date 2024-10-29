@@ -54,6 +54,7 @@ import LoadingSpinner from '../LoadingSpinner';
     const [transactions, setTransactions] = useState([]);
     const [isLoading, setIsLoading] = useState(true); // Track loading state
     const accessToken = useSelector((state) => state.auth.accessToken);
+    const userId = useSelector((state) => state.auth.user.user.id);
     const [incomePercentage, setIncomePercentage] = useState(0);
     const [expensePercentage, setExpensePercentage] = useState(0);
     // Fetch data from the API
@@ -62,7 +63,7 @@ import LoadingSpinner from '../LoadingSpinner';
     const fetchProgressData = async () => {
       try {
         setIsLoading(true);
-        const response = await axios.get('income-expense-Progress/', {
+        const response = await axios.get(`income-expense-Progress/${userId}/`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -90,7 +91,7 @@ import LoadingSpinner from '../LoadingSpinner';
       const fetchTransactions = async () => {
         try {
           setIsLoading(true);
-          const response = await axios.get('income-overview/',
+          const response = await axios.get(`income-overview/${userId}/`,
             {
               headers: {
                 Authorization: `Bearer ${accessToken}`,

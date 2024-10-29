@@ -27,6 +27,7 @@ const TanStackTable = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [transactionToDelete, setTrasactionToDelete] = useState(null);
   const accessToken = useSelector((state) => state.auth.accessToken);
+  const userId = useSelector((state) => state.auth.user.user.id);
   const generateRandomColor = () => {
     const letters = "0123456789ABCDEF";
     let color = "#";
@@ -158,7 +159,7 @@ const handleDeleteClick = (transaction) => {
 };
 const handleDeleteConfirm =async (transactionId) => {
   try {
-    const response = await axios.delete(`/transactions/${transactionId}/`, 
+    const response = await axios.delete(`/transactions/${userId}/${transactionId}/`, 
       {
         headers: {
           Authorization: `Bearer ${accessToken}` 

@@ -11,6 +11,7 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
   const [endDate, setEndDate] = useState('');
   const accessToken = useSelector((state) => state.auth.accessToken);
   const userId = useSelector((state) => state.auth.user.user.id);
+  const [loading, setLoading] = useState(false); 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -21,6 +22,7 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
       start_date: startDate,
       end_date: endDate,
     };
+    setLoading(true);
 
     try {
       const response = await axios.post(`/budgets/${userId}/`, newBudget
@@ -32,7 +34,9 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
     
       // Add the newly created budget to the list
       onAddBudget(response.data);
+      setLoading(false)
       onClose();
+
     } catch (error) {
       console.error('Error adding budget:', error);
     }
@@ -103,7 +107,10 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
               />
             </div>
           </div>
-          <button type="submit" className={styles.addButton}>Add Budget</button>
+          <button type="submit" className={styles.addButton} disabled={loading}>
+          {loading ? 'Loading...' : 'Add Budget'}
+
+          </button>
         </form>
       </div>
     </div>

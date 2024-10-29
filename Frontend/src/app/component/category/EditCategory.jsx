@@ -5,16 +5,18 @@ const EditCategory = ({ categoryData, onSubmit , onClose}) => {
   // State to manage form data
   const [name, setName] = useState(categoryData?.name || '');
   const [categoryType, setCategoryType] = useState(categoryData?.category_type || 'Income');
-
+  const [loading, setLoading] = useState(false);
   // Function to handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
     // Construct form data and pass it to the parent component
+    setLoading(true)
     const updatedCategory = {
       name,
       category_type: categoryType,
     };
     onSubmit(updatedCategory);  // Assuming onSubmit handles category update in parent component
+    setLoading(false)
   };
 
   return (
@@ -47,7 +49,9 @@ const EditCategory = ({ categoryData, onSubmit , onClose}) => {
             </select>
           </div>
 
-          <button type="submit" className={styles.addButton}>Save Category</button>
+          <button type="submit" className={styles.addButton}>
+          {loading ? 'Saving...' : 'Save category'}
+            </button>
         </form>
       </div>
     </div>

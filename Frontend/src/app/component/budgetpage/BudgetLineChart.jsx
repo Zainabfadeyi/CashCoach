@@ -22,7 +22,7 @@ const BudgetLineChart =  ({ budgetId })  => {
   const accessToken = useSelector((state) => state.auth.accessToken);
   const userId = useSelector((state) => state.auth.user.user.id);
   // Fetch the API data
-  useEffect(() => {
+ 
     const fetchTransactions = async () => {
       console.log('Fetching transactions for budgetId:', budgetId);
       try {
@@ -39,11 +39,12 @@ const BudgetLineChart =  ({ budgetId })  => {
         setLoading(false);
       }
     };
+    useEffect(() => {
 
     if (budgetId) {
       fetchTransactions(); // Fetch data only if budgetId is available
     }
-  }, [budgetId, accessToken]);
+  }, [budgetId, accessToken,fetchTransactions]);
 
   // Format the data for Nivo chart
   const data = formatDataForNivoLineChart(transactions);

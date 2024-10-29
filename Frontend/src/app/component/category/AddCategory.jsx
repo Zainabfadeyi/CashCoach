@@ -4,14 +4,17 @@ import styles from '../../../styles/category.module.css';
 const AddCategory = ({ onAddCategory }) => {
   const [name, setName] = useState('');
   const [categoryType, setCategoryType] = useState('Income'); // default type
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true)
     if (name && categoryType) {
       onAddCategory({ name, category_type: categoryType });
       setName('');
       setCategoryType('Income'); // reset to default after submission
     }
+    setLoading(false)
   };
 
   return (
@@ -43,7 +46,9 @@ const AddCategory = ({ onAddCategory }) => {
             </select>
           </div>
 
-          <button type="submit" className={styles.addButton}>Create new category</button>
+          <button type="submit" className={styles.addButton}>
+          {loading ? 'Creating...' : 'Create new category'}
+            </button>
         </form>
       </div>
     </div>

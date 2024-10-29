@@ -13,24 +13,35 @@ const ProgressBars = () => {
   const userId = useSelector((state) => state.auth.user.user.id);
   const colorPalette = ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#007bff', '#6c757d', '#343a40', '#8e44ad', '#e74c3c', '#f39c12'];
 
-  useEffect(() => {
-
-    axios.get(`/dashboard/monthly-expense-breakdown/${userId}/`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-    .then(response => {
-      const data = response.data.slice(0, 6); // Limit to first 6 items
+  const fetchData = async () => {
+    try {
+      // Fetch data from the API
+      const response = await axios.get(`/dashboard/monthly-expense-breakdown/${userId}/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+  
+      // Limit the response to the first 6 items
+      const data = response.data.slice(0, 6);
+  
+      // Calculate the total amount from the data
       const total = data.reduce((acc, item) => acc + item.amount, 0);
+  
+      // Update the state with the data and total amount
       setCategoryData(data);
       setTotalAmount(total);
-    })
-    .catch(error => {
-      console.error('Error fetching data:', error);
-    });
-  }, [accessToken]);
-
+  
+    } catch (error) {
+      // Log any errors encountered during the fetch
+      console.error('Error fetching monthly expense breakdown:', error);
+    }
+  };
+  
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+  
   return (
     <div className={styles.progressLine}>
       <div>
