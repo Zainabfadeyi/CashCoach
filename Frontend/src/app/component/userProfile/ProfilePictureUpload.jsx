@@ -60,7 +60,7 @@ const ProfilePictureUpload = () => {
   // Fetch profile image on component mount
   useEffect(() => {
     fetchProfileImage();
-  }, []);
+  }, [fetchProfileImage]);
 
 
   const handleSubmit = async (e) => {

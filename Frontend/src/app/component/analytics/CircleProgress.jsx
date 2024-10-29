@@ -3,6 +3,7 @@ import axios from '../../../api/axios'; // Import axios for API requests
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../../../styles/expenses.module.css';
 import { useSelector } from '../../../api/hook';
+import LoadingSpinner from '../LoadingSpinner';
 
 const CircularProgress = ({ incomePercentage, expensePercentage }) => {
   return (
@@ -107,7 +108,7 @@ const ProgressBars = () => {
   }, [accessToken]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return  <div><LoadingSpinner  size={50} message="Processing..."/></div>;
   }
  
 

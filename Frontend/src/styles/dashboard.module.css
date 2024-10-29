@@ -54,7 +54,7 @@
 
 }
 .progress{
-    width: 30%;
+    width: 100%;
     box-shadow: 0 0 2px 0 rgba(145, 158, 171, .3), 0 12px 24px -4px rgba(145, 158, 171, .12);
     border: 1px solid #e5e5e5;
     border-radius: 10px;

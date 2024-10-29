@@ -70,7 +70,7 @@ const IncvsExp = () => {
 
   return (
     <div>
-      <div className={styles.TopContainer}>
+      <div className={styles.TopContainer} style={{marginBottom:"10px"}}>
         <div className={styles.first}>
           <div className={styles.Analytics}>
             <div className={styles.icon} style={{ backgroundColor: "#2F2CD8" }}>

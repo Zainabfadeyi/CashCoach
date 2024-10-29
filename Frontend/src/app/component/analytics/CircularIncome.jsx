@@ -147,6 +147,7 @@ import LoadingSpinner from '../LoadingSpinner';
                   width: '100%',
                   marginBottom: '20px',
                   borderBottom: '1px solid ##e5eaef',
+                  fontSize:"18px"
                 }}
               >
                 <div style={{ fontWeight: 'bold', flexGrow: 1 }}>{transaction.category}</div>

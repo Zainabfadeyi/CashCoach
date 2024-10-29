@@ -10,45 +10,6 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 const UserProfileForm = () => {
     // const { changeEmailAPI, changePasswordAPI, deleteAccountAPI } = userFormService();
     const user = useSelector((state) => state.auth.user);
-
-    const [userProfile, setUserProfile] = useState({
-        firstname: user?.firstName || '',
-        lastname: user?.lastName || '',
-        email: user?.email || '',
-    });
-
-    const [passwordError, setPasswordError] = useState('');
-    const [showPasswordForm, setShowPasswordForm] = useState(false);
-    const [passwordFormData, setPasswordFormData] = useState({
-        currentPassword: '',
-        newPassword: '',
-        confirmNewPassword: '',
-    });
-
-    const [emailError, setEmailError] = useState('');
-    const [showEmailForm, setShowEmailForm] = useState(false);
-    const [emailFormData, setEmailFormData] = useState({
-        currentPassword: '',
-        newEmail: '',
-        confirmNewEmail: '',
-    });
-
-    const navigate = useNavigate();
-    
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setUserProfile((prevProfile) => ({ ...prevProfile, [name]: value }));
-    };
-
-    const handlePasswordChange = () => {
-        setShowPasswordForm(true);
-    };
-
-    const handlePasswordFormChange = (e) => {
-        const { name, value } = e.target;
-        setPasswordFormData((prevData) => ({ ...prevData, [name]: value }));
-    };
-
     const handleConfirmDeleteAccount = () => {
 
     }

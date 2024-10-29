@@ -25,8 +25,10 @@ const BudgetLineChart =  ({ budgetId })  => {
  
     const fetchTransactions = async () => {
       console.log('Fetching transactions for budgetId:', budgetId);
+      setLoading(true)
       try {
         const response = await axios.get(`sidebar/budgets/${userId}/${budgetId}/spending-chart/`, {
+         
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },

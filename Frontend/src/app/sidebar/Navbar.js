@@ -40,7 +40,7 @@ const Navbar = ({ selectedItem }) => {
   // Fetch profile image on component mount
   useEffect(() => {
     fetchProfileImage();
-  }, []);
+  }, [fetchProfileImage]);
 
   const handleProfileClick = () => {
     setDropdownOpen(!dropdownOpen); // Toggle dropdown visibility

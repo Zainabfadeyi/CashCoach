@@ -9,7 +9,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
   const [category_type, setcategory_type] = useState('Income'); // Default type
   const [categories, setCategories] = useState([]); // State for all categories
   const [filteredCategories, setFilteredCategories] = useState([]); // State for filtered categories
-
+  const [loading, setLoading] = useState(false); 
 
 
   const accessToken = useSelector((state) => state.auth.accessToken);
@@ -25,6 +25,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
       });
       setCategories(response.data);
       filterCategories(response.data); // Filter categories after fetching
+
     } catch (error) {
       console.error('Error fetching categories:', error);
     }
@@ -59,6 +60,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     const transactionType = category_type === 'Income' ? 'Income' : 'Expenses';
     
     const transactionData = { 
@@ -78,6 +80,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
       console.log('Transaction added:', response.data); // Optionally log or handle the response
       onAdd(response.data); // Call onAdd with the response data if necessary
       onClose();
+      setLoading(false)
     } catch (error) {
       console.error('Error adding transaction:', error);
     }
@@ -170,7 +173,9 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
             </select>
           </div>
 
-          <button type="submit" className={styles.addButton}>Add</button>
+          <button type="submit" className={styles.addButton}>
+          {loading ? 'Adding...' : 'Add Transaction'}
+            </button>
         </form>
       </div>
     </div>
