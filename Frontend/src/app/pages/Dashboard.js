@@ -151,8 +151,8 @@ const Dashboard = () => {
         </div>
         
       
-       <div >
-        <Bar  className={styles.bigChart}/>
+       <div className={styles.bigChart} >
+        <Bar />
       
         </div>
        </div>
