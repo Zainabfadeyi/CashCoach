@@ -129,29 +129,34 @@
     display: flex;
     
   }
+  .bigChert{
+    width: 70%;
+  }
+  .smallChart{
+    width: 30%;
+  }
   
   /* Responsive layout: stack components on smaller screens */
   @media (max-width: 1300px) {
     .display {
       flex-direction: column; /* Stack the components vertically */
       gap: 20px; /* Add space between stacked items */
+
     }
-  
-    /* Ensure all divs take full width in stacked layout */
-    .display > div {
-      width: 100%;
+    .smallChart{
+        width: 100%;
     }
+    .bigChert{
+        width: 65%;
+    }
+
   }
-  
-  /* Responsive layout: stack components on smaller screens */
-  @media (max-width: 1200px) {
+    @media (max-width: 1300px) {
     .TopContainer {
       flex-direction: column; 
       gap: 20px; 
-      width: 95%;
+      width: 100%;
     }
 
-    .TopContainer > div {
-      width: 95%;
-    }
+   
   }

@@ -11,7 +11,16 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
   const [endDate, setEndDate] = useState('');
   const accessToken = useSelector((state) => state.auth.accessToken);
   const userId = useSelector((state) => state.auth.user.user.id);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
+
+  const resetFields = () => {
+    setName('');
+    setAmountSpent('');
+    setTotalAmount('');
+    setStartDate('');
+    setEndDate('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -25,21 +34,25 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
     setLoading(true);
 
     try {
-      const response = await axios.post(`/budgets/${userId}/`, newBudget
-        , {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-    
+      const response = await axios.post(`/budget/${userId}/`, newBudget, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
       // Add the newly created budget to the list
       onAddBudget(response.data);
-      setLoading(false)
+      setLoading(false);
       onClose();
-
     } catch (error) {
       console.error('Error adding budget:', error);
+      setLoading(false);
     }
+  };
+
+  const handleClose = () => {
+    resetFields(); // Reset fields when modal closes
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -48,7 +61,7 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <h2 className={styles.modalTitle}>Add New Budget</h2>
-        <button className={styles.closeButton} onClick={onClose}>×</button>
+        <button className={styles.closeButton} onClick={handleClose}>×</button>
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
             <label className={styles.label} htmlFor="name">Budget Name</label>
@@ -108,8 +121,7 @@ const AddBudgetModal = ({ isOpen, onClose, onAddBudget }) => {
             </div>
           </div>
           <button type="submit" className={styles.addButton} disabled={loading}>
-          {loading ? 'Loading...' : 'Add Budget'}
-
+            {loading ? 'Loading...' : 'Add Budget'}
           </button>
         </form>
       </div>

@@ -149,6 +149,7 @@ const handleUpdateTransaction = (updatedTransaction) => {
       transaction.id === updatedTransaction.id ? updatedTransaction : transaction
     )
   );
+  AllTransactions()
   handleCloseEditModal(); // Close the modal after updating
 };
 
@@ -167,6 +168,7 @@ const handleDeleteConfirm =async (transactionId) => {
   });
   if (response.data) {
     console.log("Memo deleted successfully.");
+    AllTransactions()
     getData(); // Fetch the data again after deletion
   } else {
     console.error("Failed to delete memo.");

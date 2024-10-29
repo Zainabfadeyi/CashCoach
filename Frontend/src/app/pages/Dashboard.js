@@ -138,21 +138,21 @@ const Dashboard = () => {
 
       </div>
       <div className={styles. display} >
-        <div style={{width:"70%"}}>
+        <div  className={styles.bigChart} >
       <LineChart/>
         </div>
-        <div style={{width:"30%"}}>
+        <div  className={styles.smallChart} >
         <ProgressBars/>
         </div>
        </div>
        <div className={styles. display} >
-        <div style={{width:"30%"}}>
+        <div className={styles.smallChart} >
         <Progress/>
         </div>
         
       
-       <div style={{width:"70%"}}>
-        <Bar/>
+       <div >
+        <Bar  className={styles.bigChart}/>
       
         </div>
        </div>

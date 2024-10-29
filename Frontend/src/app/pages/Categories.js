@@ -82,7 +82,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const handleUpdateCategory = async (updatedCategory) => {
     try {
-      const response = await axios.put(`categories/${userId}/${editCategory.id}/`, updatedCategory, {
+      const response = await axios.put(`categories/edit/${userId}/${editCategory.id}/`, updatedCategory, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -98,7 +98,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const handleDeleteCategoryClick = async (categoryId) => {
     try {
       // Fetch category details by ID (if not already in state)
-      const response = await axios.get(`categories/${categoryId}/`, {
+      const response = await axios.get(`categories/delete/${userId}/${categoryId}/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

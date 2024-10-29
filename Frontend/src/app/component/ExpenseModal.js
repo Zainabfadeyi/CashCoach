@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from '../../api/axios'; // Adjust the import based on your axios setup
 import styles from '../../styles/ExpenseModal.module.css';
 import { useSelector } from '../../api/hook';
+import { useFetchTransactions } from '../../api/apiFolder/tableApi';
 
 const ExpenseModal = ({ isOpen, onClose, onAdd }) => {
   const [amount, setAmount] = useState('');
@@ -12,7 +13,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd }) => {
   const [filteredCategories, setFilteredCategories] = useState([]); // State for filtered categories
   const [category, setCategory] = useState(''); // Default selected category
   const [loading, setLoading] = useState(false); 
-
+  const { AllTransactions } = useFetchTransactions();
   const accessToken = useSelector((state) => state.auth.accessToken);
   const userId = useSelector((state) => state.auth.user.user.id);
 
@@ -81,6 +82,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd }) => {
       });
       onAdd(response.data); // Call onAdd with the response data if necessary
       resetFields();
+      AllTransactions()
       onClose();
     } catch (error) {
       console.error('Error adding transaction:', error);

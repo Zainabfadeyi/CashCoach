@@ -11,7 +11,7 @@ const EditTableModal = ({ isOpen, onClose, transaction, onUpdate }) => {
     const [category, setCategory] = useState('');
   
     const accessToken = useSelector((state) => state.auth.accessToken);
-  
+    const userId = useSelector((state) => state.auth.user.user.id);
     useEffect(() => {
       if (transaction) {
         setAmount(transaction.amount);
@@ -34,7 +34,7 @@ const EditTableModal = ({ isOpen, onClose, transaction, onUpdate }) => {
       };
       
       try {
-        const response = await axios.put(`/transactions/${transaction.id}/`, updatedTransaction, {
+        const response = await axios.put(`/transactions/${userId}/${transaction.id}/`, updatedTransaction, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           }
