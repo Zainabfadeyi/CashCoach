@@ -17,7 +17,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
   // Fetch all categories from the API
   const fetchCategories = async () => {
     try {
-      const response = await axios.get(`categories/${userId}/`, {
+      const response = await axios.get(`categories/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -72,7 +72,7 @@ const ExpenseModal = ({ isOpen, onClose, onAdd}) => {
     };
     
     try {
-      const response = await axios.post(`transactions/?user_id=${userId}/`, transactionData, {
+      const response = await axios.post(`transactions/`, transactionData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         }

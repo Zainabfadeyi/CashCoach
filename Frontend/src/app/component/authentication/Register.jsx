@@ -12,6 +12,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const Register = () => {
 
+  const [loading, setLoading] = useState(false);
 
   const firstNameRef = useRef(null);
   const lastNameRef = useRef(null);
@@ -81,7 +82,7 @@ const Register = () => {
       setErrMsg("Invalid Entry");
       return;
     }
-
+    setLoading(true);
     try {
       const response = await axios.post('/auth/register/', {
         first_name,
@@ -101,7 +102,6 @@ const Register = () => {
       setEmail('');
       setPwd('');
       setMatchPwd('');
-
       setCustomMessage('Registration successful! Redirecting to login page...');
       setTimeout(() => {
         window.location.href = '/login';
@@ -116,6 +116,9 @@ const Register = () => {
         setErrMsg('Registration Failed');
       }
       if (errRef.current) errRef.current.focus();
+    }
+    finally {
+      setLoading(false); // Reset loading to false after submission is complete
     }
   };
 
@@ -328,7 +331,10 @@ const Register = () => {
           Must match the first password input field.
           </p>
           </div>
-          <button type="submit" className={styles.buttonReg}>Sign Up</button>
+          <button type="submit" className={styles.buttonReg} disabled={loading}>
+            {loading ? 'Registering...' : 'Sign Up'}
+          </button>
+
                 <div>
                 Already registered?
                 <span>

@@ -51,10 +51,6 @@ const BudgetLineChart =  ({ budgetId })  => {
   // Format the data for Nivo chart
   const data = formatDataForNivoLineChart(transactions);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   if (error) {
     return <div>Error fetching data: {error.message}</div>;
   }

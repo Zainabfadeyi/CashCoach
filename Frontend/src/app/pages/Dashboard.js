@@ -146,9 +146,12 @@ const Dashboard = () => {
         </div>
        </div>
        <div className={styles. display} >
-         <Progress/>
+        <div style={{width:"30%"}}>
+        <Progress/>
+        </div>
+        
       
-       <div >
+       <div style={{width:"70%"}}>
         <Bar/>
       
         </div>

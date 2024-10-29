@@ -60,7 +60,7 @@ const IncvsExp = () => {
   }, []);
 
   if (loading) {
-    return <div> <LoadingSpinner message="Loading expenses data..." /></div>;
+    return <div> <LoadingSpinner message="Loading All data..." /></div>;
   }
 
   if (error) {

@@ -14,6 +14,7 @@ import React, {
   const LOGIN_URL = "auth/login/";
   
   const Login = () => {
+    const [loading, setLoading] = useState(false);
     const userRef = useRef(null);
     const errRef = useRef(null);
   
@@ -40,6 +41,7 @@ import React, {
     const handleSubmit = async (e) => {
       e.preventDefault();
       console.log(email, pwd);
+      setLoading(true);
       try {
           const response = await axios.post(
               LOGIN_URL,
@@ -85,6 +87,8 @@ import React, {
               setErrMsg('Login Failed');
           }
           if (errRef.current) errRef.current.focus();
+      }finally {
+        setLoading(false); // Reset loading to false after submission is complete
       }
       
     };
@@ -154,7 +158,7 @@ import React, {
                   <Link to="/forgotPassword">Forgot Password?</Link>
                 </div>
                 <button type="submit" onClick={handleSubmit} className={styles.buttonReg}>
-                  Sign In
+                {loading ? 'login...' : 'Sign In'}
                 </button>
                 <p>
                   Need an Account?
