@@ -64,7 +64,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
         category_type: newCategory.category_type,
       };
 
-      const response = await axios.post('categories/', categoryData, {
+      const response = await axios.post(`categories/?user_id=${userId}/`, categoryData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
