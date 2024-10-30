@@ -39,7 +39,11 @@ const EditTableModal = ({ isOpen, onClose, transaction, onUpdate }) => {
             Authorization: `Bearer ${accessToken}`,
           }
         });
-        onUpdate(response.data); // Update the transaction in the parent component
+      
+    if (response.status === 200) {
+      onUpdate(response.data); // Update the transaction in the parent component
+      onClose(); // Close the modal
+    }
       } catch (error) {
         console.error('Error updating transaction:', error);
       }

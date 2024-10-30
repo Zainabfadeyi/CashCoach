@@ -98,7 +98,7 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const handleDeleteCategoryClick = async (categoryId) => {
     try {
       // Fetch category details by ID (if not already in state)
-      const response = await axios.get(`categories/delete/${userId}/${categoryId}/`, {
+      const response = await axios.get(`categories/${categoryId}/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -146,10 +146,10 @@ const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   return (
     <div className={styles.Categories}>
-      <div style={{ width: "30%" }}>
+      <div className={styles.AddCategory}>
         <AddCategory onAddCategory={handleAddCategory} />
       </div>
-      <div style={{ width: '70%' }}>
+      <div className={styles.incomeCategories}>
         <div className={styles.IncExp}>
           <div style={{ fontSize: '18px', marginBottom: '15px',color:"#1F2C73" ,fontWeight:"600" }}>Income Categories</div>
           {incomeCategories.map((category, index) => (

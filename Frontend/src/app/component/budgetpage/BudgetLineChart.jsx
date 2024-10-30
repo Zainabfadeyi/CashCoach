@@ -46,7 +46,7 @@ const BudgetLineChart =  ({ budgetId })  => {
     if (budgetId) {
       fetchTransactions(); // Fetch data only if budgetId is available
     }
-  }, []);
+  }, [fetchTransactions]);
 
   // Format the data for Nivo chart
   const data = formatDataForNivoLineChart(transactions);

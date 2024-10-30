@@ -200,3 +200,23 @@
     align-items: center;
     column-gap: 10px;
 }
+.AddCategory{
+    width: 30%;
+}
+.incomeCategories{
+    width: 70%;
+}
+@media (max-width: 1200px) {
+    .AddCategory{
+        width: 87%;
+    }
+    .incomeCategories{
+        width: 87%;
+        margin-top: 15px;
+    }
+    .Categories{
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+}

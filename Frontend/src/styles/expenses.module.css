@@ -22,3 +22,27 @@
     display: flex;
     width: 100%;
 }
+.CircularIncome{
+    width: 30%;
+}
+.TanStackTable{
+    width: 70%;
+}
+
+@media (max-width: 1200px) {
+   .Expenses{
+    display: flex;
+    flex-direction: column;
+    
+   }
+   .CircularIncome{
+    width: 87%;
+   }
+   .TanStackTable{
+    width: 87%;
+    margin-top: 15px;
+   }
+   .progressWrapper{
+    width: 100%;
+   }
+  }

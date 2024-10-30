@@ -26,10 +26,10 @@ const Expenses = () => {
       ) : (
 
         <>
-          <div style={{ width: "30%" }}>
+          <div className={styles.CircularIncome} >
             <CircularIncome />
           </div>
-          <div style={{ width: "70%" }}>
+          <div className={styles.TanStackTable}>
             <TanStackTable/>
           </div>
         </>
