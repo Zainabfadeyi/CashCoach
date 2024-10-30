@@ -44,7 +44,7 @@ const BudgetLineChart = ({ budgetId }) => {
     if (budgetId) {
       fetchTransactions(); // Fetch data only if budgetId is available
     }
-  }, []);
+  }, [budgetId]);
 
   // Format the data for Nivo chart
   const data = formatDataForNivoLineChart(transactions);
@@ -63,7 +63,7 @@ const BudgetLineChart = ({ budgetId }) => {
         // Show loading state while fetching data
         <div style={{ textAlign: 'center', padding: '20px' }}>
           <div className={styles.loadingSpinner}></div>
-          <div><LoadingSpinner message="please wait..." size={20} /></div>
+          <div>loading...</div>
         </div>
       ) : (
         // Once the data is loaded, show the chart
