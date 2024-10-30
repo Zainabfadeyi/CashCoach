@@ -147,7 +147,7 @@ import React, {
                   onChange={(e) => setPwd(e.target.value)}
                   value={pwd}
                 />
-              <div
+              {/* <div
                   style={{
                     display: "flex",
                     justifyContent: "right",
@@ -156,7 +156,7 @@ import React, {
                   }}
                 >
                   <Link to="/forgotPassword">Forgot Password?</Link>
-                </div>
+                </div> */}
                 <button type="submit" onClick={handleSubmit} className={styles.buttonReg}>
                 {loading ? 'login...' : 'Sign In'}
                 </button>
