@@ -205,4 +205,23 @@
     padding: 16px;
     justify-content: center;
   }
- 
+ @media ( max-width:768px){
+  .DownloadIncxExp{
+    background-color: none;
+    font-size: 20px;
+    margin: 0;
+    margin-left: 13px;
+  }
+  .paginationContainer{
+    width: 100%;
+    font-size: 12px;
+  }
+  .pageInfo{
+    width: 100%;
+
+  }
+  .tableCell{
+    padding: 5px;
+    font-size: 12px;
+  }
+ }

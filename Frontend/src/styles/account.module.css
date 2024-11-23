@@ -100,3 +100,20 @@
     margin-left: 10px;
     
 }
+@media (max-width: 768px) {
+  .TopContainer{
+    display: flex;
+    flex-direction: column;
+
+  }
+  .second{
+    display: flex;
+    justify-content: flex-start;
+  }
+  .section{
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+
+  }
+}

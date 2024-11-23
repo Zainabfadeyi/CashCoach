@@ -160,3 +160,20 @@
 
    
   }
+  .barOverall{
+    height: 300px;
+    transform-origin: center;
+    width: 100%;
+  }
+  @media (max-width:768px){
+    .barContainer{
+        width: 100%;
+
+    }
+    .barOverall{
+        height: 300px;
+        transform-origin: center;
+        width: 100%;
+      }
+      
+  }

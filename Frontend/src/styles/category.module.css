@@ -208,10 +208,10 @@
 }
 @media (max-width: 1200px) {
     .AddCategory{
-        width: 92%;
+        width: 100%;
     }
     .incomeCategories{
-        width: 92%;
+        width: 100%;
         margin-top: 15px;
     }
     .Categories{

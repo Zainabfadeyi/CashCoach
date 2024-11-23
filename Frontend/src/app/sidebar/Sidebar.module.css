@@ -1,5 +1,5 @@
 .sidebar {
-  /* position: fixed; */
+
   left: 0;
   top: 0;
   bottom: 0;
@@ -129,3 +129,29 @@
     margin-bottom: 10px;
 }
 
+@media (max-width: 768px) {
+  .closed{
+    width: 40px;
+    position: absolute;
+    height: 0;
+  }
+
+  .closed .sidebar .closed{
+    position: absolute;
+    height: 8vh;
+  }
+  .closed  .navigation {
+    width: 0px;
+    display: none;
+
+  }
+  .closed .logo{
+    display: none;
+  }
+  .sidebar{
+    position: fixed;
+    z-index: 1000;
+ 
+  }
+
+}

@@ -39,12 +39,12 @@ const OverallBar = () => {
         {loading ? (
         <LoadingSpinner message="Loading data..." />  
       ) : (
-        <div style={{ height: "380px", transformOrigin: "center" }}>
+        <div className={styles.barOverall} >
           <ResponsiveBar
             data={barChartData}
             keys={["Income", "Expenses"]}
             indexBy="month"
-            margin={{ top: 50, right: 100, bottom: 70, left: 90 }}
+            margin={{ top: 50,  bottom: 70, left: 30 }}
             borderWidth={2}
             padding={0.1}
             groupMode="grouped"

@@ -1,9 +1,24 @@
 .right {
-    width: 100%;
+
     min-width: calc(60vw);
     max-height: 100dvh;
     overflow-y: scroll;
    
+ }
+
+ .wrapper{
+  display: flex;
+  width: 100%;
+  height: 100vh;
+ }
+ .cover{
+  width: 1000%;
+  display:flex;
+  background-color:#F6F9FC;
+ }
+ .sider{
+  display: flex;
+  height: 100vh;
  }
 
  
@@ -18,7 +33,10 @@
  @media screen and (max-width: 768px) {
    .right {
   
-      width: 100vw; 
+      width: 100%; 
+   }
+   .cover{
+    width: 85%;
    }
  }
  

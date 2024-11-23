@@ -32,8 +32,8 @@ const LayoutComp = () => {
       {
         loaded ? (
           authToken ? (
-            <div style={{ width: "100%", display: "flex", height: "100vh" }}>
-              <div style={{ display: "flex", height: "100vh" }}>
+            <div className={styles.wrapper}>
+              <div className={styles.sider} >
                 {isSidebarOpen && (
                   <SideBar
                     isOpen={isSidebarOpen}
@@ -42,7 +42,7 @@ const LayoutComp = () => {
                   />
                 )}
               </div>
-              <Layout style={{ display: "flex", width:"100%", backgroundColor:"#F6F9FC"}}>
+              <Layout className={styles.cover}>
                 <div>
                   <Navbar
                     toggleSidebar={toggleSidebar}

@@ -96,7 +96,7 @@ WSGI_APPLICATION = 'financemanager.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.parse('postgresql://finances_94b2_user:9ta46wxltbiK29EytRiIRKlgzN3ILhCH@dpg-cs7ggu3v2p9s73f28c1g-a.oregon-postgres.render.com/finances_94b2')
+    'default': dj_database_url.parse('postgresql://finances_njho_user:PZpnQVe2jO7jyy7uzhxfFItr170zPQWi@dpg-csuic2q3esus73cjag1g-a.oregon-postgres.render.com/finances_njho')
 }
 
 
