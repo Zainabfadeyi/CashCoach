@@ -37,7 +37,7 @@ class BudgetSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)  # Use nested serializer
     class Meta:
         model = Budget
-        exclude=['user','created_at','transaction']
+        exclude=['user','created_at']
     def create(self, validated_data):
         # Check if a budget with the same name already exists for the user
         user = self.context['request'].user

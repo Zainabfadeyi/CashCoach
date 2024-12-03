@@ -87,7 +87,7 @@ class Transaction(models.Model):
 class Budget(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    transaction = models.ForeignKey('Transaction', related_name="budget",on_delete=models.CASCADE,null=False)
+    # transaction = models.ForeignKey('Transaction', related_name="budget",on_delete=models.CASCADE,null=False)
     category = models.ForeignKey(AllCategory, on_delete=models.CASCADE, null=True, blank=True)
     total_amount = models.DecimalField(max_digits=12, decimal_places=2, null=False)
     amount_spent = models.DecimalField(max_digits=12, decimal_places=2, null=False)
